@@ -1,0 +1,3459 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Guía Épica de Minería de Datos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      /* ============================
+   RESET & BASE
+   ============================ */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: #0a0a0f;
+        color: #e8e6f0;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* ============================
+   CSS VARIABLES (per topic)
+   ============================ */
+      :root {
+        --c1: #00d4ff; /* Requerimientos */
+        --c2: #22c55e; /* Ecosistema */
+        --c3: #f59e0b; /* ML */
+        --c4: #a78bfa; /* CRISP-DM */
+        --c5: #f87171; /* Evaluación */
+        --c6: #34d399; /* Árboles */
+        --bg-card: #13131a;
+        --bg-card2: #1a1a24;
+        --border: rgba(255, 255, 255, 0.07);
+        --text-muted: #8885a0;
+        --text-secondary: #b8b5cc;
+      }
+
+      /* ============================
+   SIDEBAR
+   ============================ */
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 72px;
+        height: 100vh;
+        background: #0d0d14;
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 0;
+        gap: 6px;
+        z-index: 100;
+      }
+      .sidebar-logo {
+        font-family: "Syne", sans-serif;
+        font-weight: 800;
+        font-size: 18px;
+        color: #fff;
+        margin-bottom: 20px;
+        writing-mode: vertical-rl;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        transform: rotate(180deg);
+        opacity: 0.3;
+      }
+      .nav-dot {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: var(--text-muted);
+        border: 1px solid transparent;
+        text-decoration: none;
+      }
+      .nav-dot:hover,
+      .nav-dot.active {
+        background: rgba(255, 255, 255, 0.06);
+        border-color: var(--border);
+        color: #fff;
+      }
+      .nav-dot[data-topic="1"].active {
+        color: var(--c1);
+        border-color: var(--c1);
+      }
+      .nav-dot[data-topic="2"].active {
+        color: var(--c2);
+        border-color: var(--c2);
+      }
+      .nav-dot[data-topic="3"].active {
+        color: var(--c3);
+        border-color: var(--c3);
+      }
+      .nav-dot[data-topic="4"].active {
+        color: var(--c4);
+        border-color: var(--c4);
+      }
+      .nav-dot[data-topic="5"].active {
+        color: var(--c5);
+        border-color: var(--c5);
+      }
+      .nav-dot[data-topic="6"].active {
+        color: var(--c6);
+        border-color: var(--c6);
+      }
+
+      /* ============================
+   MAIN LAYOUT
+   ============================ */
+      .main {
+        margin-left: 72px;
+        padding: 0;
+      }
+
+      /* ============================
+   HERO
+   ============================ */
+      .hero {
+        padding: 80px 60px 60px;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+        overflow: hidden;
+      }
+      .hero::before {
+        content: "";
+        position: absolute;
+        top: -100px;
+        right: -100px;
+        width: 500px;
+        height: 500px;
+        background: radial-gradient(
+          circle,
+          rgba(0, 212, 255, 0.06) 0%,
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+      .hero-tag {
+        display: inline-block;
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        color: var(--c1);
+        border: 1px solid var(--c1);
+        border-radius: 4px;
+        padding: 3px 10px;
+        margin-bottom: 20px;
+        letter-spacing: 1px;
+      }
+      .hero h1 {
+        font-family: "Syne", sans-serif;
+        font-size: clamp(36px, 5vw, 64px);
+        font-weight: 800;
+        line-height: 1.05;
+        color: #fff;
+        margin-bottom: 16px;
+      }
+      .hero h1 span {
+        color: var(--c1);
+      }
+      .hero p {
+        font-size: 16px;
+        color: var(--text-secondary);
+        max-width: 600px;
+        line-height: 1.7;
+        margin-bottom: 30px;
+      }
+      .topics-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 24px;
+      }
+      .topic-pill {
+        font-size: 12px;
+        padding: 6px 14px;
+        border-radius: 20px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid var(--border);
+        color: var(--text-secondary);
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+      }
+      .topic-pill:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: #fff;
+      }
+
+      /* ============================
+   SECTION
+   ============================ */
+      .section {
+        padding: 70px 60px;
+        border-bottom: 1px solid var(--border);
+        position: relative;
+      }
+      .section-num {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        color: var(--text-muted);
+        letter-spacing: 2px;
+        margin-bottom: 8px;
+      }
+      .section-header {
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+        margin-bottom: 40px;
+      }
+      .section-icon {
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        flex-shrink: 0;
+      }
+      .section h2 {
+        font-family: "Syne", sans-serif;
+        font-weight: 700;
+        font-size: 28px;
+        color: #fff;
+        line-height: 1.2;
+      }
+      .section h2 .accent {
+      }
+      .section-subtitle {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-top: 4px;
+      }
+
+      /* Color accents per section */
+      .s1 .section-icon {
+        background: rgba(0, 212, 255, 0.12);
+      }
+      .s1 .accent {
+        color: var(--c1);
+      }
+      .s1 .kw {
+        background: rgba(0, 212, 255, 0.12);
+        color: var(--c1);
+      }
+      .s1 .stripe {
+        background: linear-gradient(
+          90deg,
+          rgba(0, 212, 255, 0.15),
+          transparent
+        );
+      }
+
+      .s2 .section-icon {
+        background: rgba(34, 197, 94, 0.12);
+      }
+      .s2 .accent {
+        color: var(--c2);
+      }
+      .s2 .kw {
+        background: rgba(34, 197, 94, 0.12);
+        color: var(--c2);
+      }
+      .s2 .stripe {
+        background: linear-gradient(
+          90deg,
+          rgba(34, 197, 94, 0.15),
+          transparent
+        );
+      }
+
+      .s3 .section-icon {
+        background: rgba(245, 158, 11, 0.12);
+      }
+      .s3 .accent {
+        color: var(--c3);
+      }
+      .s3 .kw {
+        background: rgba(245, 158, 11, 0.12);
+        color: var(--c3);
+      }
+      .s3 .stripe {
+        background: linear-gradient(
+          90deg,
+          rgba(245, 158, 11, 0.15),
+          transparent
+        );
+      }
+
+      .s4 .section-icon {
+        background: rgba(167, 139, 250, 0.12);
+      }
+      .s4 .accent {
+        color: var(--c4);
+      }
+      .s4 .kw {
+        background: rgba(167, 139, 250, 0.12);
+        color: var(--c4);
+      }
+      .s4 .stripe {
+        background: linear-gradient(
+          90deg,
+          rgba(167, 139, 250, 0.15),
+          transparent
+        );
+      }
+
+      .s5 .section-icon {
+        background: rgba(248, 113, 113, 0.12);
+      }
+      .s5 .accent {
+        color: var(--c5);
+      }
+      .s5 .kw {
+        background: rgba(248, 113, 113, 0.12);
+        color: var(--c5);
+      }
+      .s5 .stripe {
+        background: linear-gradient(
+          90deg,
+          rgba(248, 113, 113, 0.15),
+          transparent
+        );
+      }
+
+      .s6 .section-icon {
+        background: rgba(52, 211, 153, 0.12);
+      }
+      .s6 .accent {
+        color: var(--c6);
+      }
+      .s6 .kw {
+        background: rgba(52, 211, 153, 0.12);
+        color: var(--c6);
+      }
+      .s6 .stripe {
+        background: linear-gradient(
+          90deg,
+          rgba(52, 211, 153, 0.15),
+          transparent
+        );
+      }
+
+      /* ============================
+   KEYWORD HIGHLIGHTS
+   ============================ */
+      .kw {
+        display: inline;
+        padding: 1px 6px;
+        border-radius: 4px;
+        font-weight: 500;
+      }
+      mark {
+        background: rgba(245, 158, 11, 0.25);
+        color: #f59e0b;
+        padding: 1px 3px;
+        border-radius: 3px;
+      }
+
+      /* ============================
+   ANALOGY CARD
+   ============================ */
+      .analogy-card {
+        border-radius: 14px;
+        padding: 20px 24px;
+        margin-bottom: 32px;
+        border: 1px solid var(--border);
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+        background: var(--bg-card);
+      }
+      .analogy-emoji {
+        font-size: 28px;
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+      .analogy-card h4 {
+        font-family: "Syne", sans-serif;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+        opacity: 0.5;
+      }
+      .analogy-card p {
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 1.7;
+      }
+      .analogy-card strong {
+        color: #fff;
+      }
+
+      /* ============================
+   CONTENT BLOCKS
+   ============================ */
+      .body-text {
+        font-size: 15px;
+        line-height: 1.8;
+        color: var(--text-secondary);
+        margin-bottom: 24px;
+        max-width: 780px;
+      }
+      .body-text strong {
+        color: #fff;
+        font-weight: 500;
+      }
+
+      h3 {
+        font-family: "Syne", sans-serif;
+        font-size: 18px;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 14px;
+        margin-top: 32px;
+      }
+
+      /* ============================
+   COMPARISON TABLE
+   ============================ */
+      .table-wrap {
+        overflow-x: auto;
+        margin-bottom: 28px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13.5px;
+      }
+      th {
+        font-family: "Syne", sans-serif;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        padding: 10px 16px;
+        text-align: left;
+        border-bottom: 1px solid var(--border);
+      }
+      td {
+        padding: 11px 16px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        color: var(--text-secondary);
+        line-height: 1.5;
+        vertical-align: top;
+      }
+      td strong {
+        color: #fff;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: rgba(255, 255, 255, 0.02);
+      }
+
+      /* ============================
+   DIAGRAM BOXES
+   ============================ */
+      .diagram {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 28px;
+        margin-bottom: 28px;
+        overflow-x: auto;
+      }
+      .diagram h4 {
+        font-family: "DM Mono", monospace;
+        font-size: 11px;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+
+      /* Flowchart */
+      .flow {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0;
+      }
+      .flow-box {
+        padding: 10px 18px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 500;
+        border: 1px solid var(--border);
+        background: var(--bg-card2);
+        color: #fff;
+        white-space: nowrap;
+        text-align: center;
+      }
+      .flow-box.phase {
+        min-width: 120px;
+      }
+      .flow-arrow {
+        color: var(--text-muted);
+        font-size: 18px;
+        padding: 0 6px;
+      }
+      .flow-vertical {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+      }
+      .flow-vertical .flow-box {
+        min-width: 260px;
+      }
+      .flow-vertical .flow-arrow {
+        transform: rotate(90deg);
+        padding: 4px 0;
+        align-self: center;
+      }
+
+      /* Bias-Variance diagram */
+      .bv-diagram {
+        display: flex;
+        gap: 16px;
+        margin-top: 12px;
+        flex-wrap: wrap;
+      }
+      .bv-box {
+        flex: 1;
+        min-width: 180px;
+        padding: 16px;
+        border-radius: 10px;
+        border: 1px solid var(--border);
+      }
+      .bv-box h5 {
+        font-family: "Syne", sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .bv-box p {
+        font-size: 12.5px;
+        color: var(--text-secondary);
+        line-height: 1.6;
+      }
+
+      /* Confusion matrix */
+      .cm-grid {
+        display: grid;
+        grid-template-columns: 80px 1fr 1fr;
+        gap: 6px;
+        max-width: 400px;
+        margin: 12px 0;
+      }
+      .cm-cell {
+        padding: 14px 10px;
+        border-radius: 8px;
+        font-size: 13px;
+        text-align: center;
+        font-weight: 500;
+      }
+      .cm-header {
+        background: transparent;
+        color: var(--text-muted);
+        font-size: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .cm-tp {
+        background: rgba(52, 211, 153, 0.15);
+        color: #34d399;
+        border: 1px solid rgba(52, 211, 153, 0.3);
+      }
+      .cm-tn {
+        background: rgba(52, 211, 153, 0.1);
+        color: #34d399;
+        border: 1px solid rgba(52, 211, 153, 0.2);
+      }
+      .cm-fp {
+        background: rgba(248, 113, 113, 0.15);
+        color: #f87171;
+        border: 1px solid rgba(248, 113, 113, 0.3);
+      }
+      .cm-fn {
+        background: rgba(245, 158, 11, 0.15);
+        color: #f59e0b;
+        border: 1px solid rgba(245, 158, 11, 0.3);
+      }
+
+      /* Tree diagram */
+      .tree-visual {
+        font-family: "DM Mono", monospace;
+        font-size: 13px;
+        line-height: 2;
+        color: var(--text-secondary);
+      }
+      .tree-node {
+        display: inline-block;
+        padding: 6px 14px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 500;
+      }
+      .tree-root {
+        background: rgba(52, 211, 153, 0.15);
+        color: #34d399;
+        border: 1px solid rgba(52, 211, 153, 0.3);
+      }
+      .tree-inner {
+        background: rgba(167, 139, 250, 0.15);
+        color: #a78bfa;
+        border: 1px solid rgba(167, 139, 250, 0.3);
+      }
+      .tree-leaf-yes {
+        background: rgba(34, 197, 94, 0.15);
+        color: #22c55e;
+        border: 1px solid rgba(34, 197, 94, 0.3);
+      }
+      .tree-leaf-no {
+        background: rgba(248, 113, 113, 0.15);
+        color: #f87171;
+        border: 1px solid rgba(248, 113, 113, 0.3);
+      }
+
+      /* ============================
+   FORMULA BOX
+   ============================ */
+      .formula {
+        background: #0d0d14;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 16px 20px;
+        font-family: "DM Mono", monospace;
+        font-size: 13px;
+        color: #e0ddf0;
+        margin: 14px 0;
+        line-height: 1.8;
+        overflow-x: auto;
+      }
+      .formula .comment {
+        color: var(--text-muted);
+      }
+      .formula .highlight {
+        color: #f59e0b;
+      }
+      .formula .green {
+        color: #34d399;
+      }
+      .formula .red {
+        color: #f87171;
+      }
+      .formula .blue {
+        color: #60a5fa;
+      }
+      .formula .purple {
+        color: #a78bfa;
+      }
+
+      /* ============================
+   BUSINESS EXAMPLE
+   ============================ */
+      .biz-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 22px 24px;
+        margin-bottom: 28px;
+      }
+      .biz-card .biz-tag {
+        font-size: 11px;
+        font-family: "DM Mono", monospace;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .biz-card h4 {
+        font-family: "Syne", sans-serif;
+        font-size: 16px;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 8px;
+      }
+      .biz-card p {
+        font-size: 14px;
+        color: var(--text-secondary);
+        line-height: 1.7;
+      }
+      .biz-card .roi-badge {
+        display: inline-block;
+        margin-top: 12px;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        background: rgba(34, 197, 94, 0.12);
+        color: #22c55e;
+        border: 1px solid rgba(34, 197, 94, 0.3);
+      }
+
+      /* ============================
+   CHEAT SHEET
+   ============================ */
+      .cheatsheet {
+        border-radius: 14px;
+        overflow: hidden;
+        margin-bottom: 28px;
+        border: 1px solid var(--border);
+      }
+      .cheatsheet-header {
+        padding: 14px 20px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        user-select: none;
+        transition: background 0.2s;
+      }
+      .cheatsheet-header:hover {
+        background: rgba(255, 255, 255, 0.03);
+      }
+      .cheatsheet-header h4 {
+        font-family: "Syne", sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+      }
+      .cheatsheet-toggle {
+        font-size: 12px;
+        color: var(--text-muted);
+        transition: transform 0.3s;
+      }
+      .cheatsheet-toggle.open {
+        transform: rotate(180deg);
+      }
+      .cheatsheet-body {
+        display: none;
+        padding: 20px;
+        border-top: 1px solid var(--border);
+        background: var(--bg-card);
+      }
+      .cheatsheet-body.open {
+        display: block;
+      }
+      .cs-item {
+        display: flex;
+        gap: 10px;
+        padding: 7px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        font-size: 13.5px;
+        line-height: 1.5;
+      }
+      .cs-item:last-child {
+        border-bottom: none;
+      }
+      .cs-bullet {
+        flex-shrink: 0;
+        font-weight: 700;
+      }
+      .cs-text {
+        color: var(--text-secondary);
+      }
+      .cs-text strong {
+        color: #fff;
+        font-weight: 500;
+      }
+
+      /* ============================
+   SELF-TEST
+   ============================ */
+      .quiz-block {
+        background: var(--bg-card2);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        padding: 24px;
+        margin-top: 16px;
+      }
+      .quiz-block h4 {
+        font-family: "Syne", sans-serif;
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 18px;
+      }
+      .quiz-q {
+        margin-bottom: 16px;
+      }
+      .quiz-q p {
+        font-size: 14px;
+        color: #fff;
+        font-weight: 500;
+        margin-bottom: 10px;
+        line-height: 1.5;
+      }
+      .quiz-q p::before {
+        content: "❓ ";
+      }
+      .blank-field {
+        width: 100%;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px dashed rgba(255, 255, 255, 0.15);
+        border-radius: 8px;
+        padding: 10px 14px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 13px;
+        color: #fff;
+        resize: vertical;
+        min-height: 44px;
+        transition: border-color 0.2s;
+      }
+      .blank-field:focus {
+        outline: none;
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+      .reveal-btn {
+        margin-top: 8px;
+        font-size: 12px;
+        padding: 5px 14px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: transparent;
+        color: var(--text-muted);
+        cursor: pointer;
+        transition: all 0.2s;
+        font-family: "DM Sans", sans-serif;
+      }
+      .reveal-btn:hover {
+        background: rgba(255, 255, 255, 0.06);
+        color: #fff;
+      }
+      .quiz-answer {
+        display: none;
+        margin-top: 10px;
+        padding: 10px 14px;
+        background: rgba(255, 255, 255, 0.04);
+        border-radius: 8px;
+        font-size: 13px;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        border-left: 3px solid #34d399;
+      }
+      .quiz-answer strong {
+        color: #fff;
+      }
+
+      /* ============================
+   CRISP-DM CYCLE
+   ============================ */
+      .crisp-flow {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        max-width: 520px;
+      }
+      .crisp-phase {
+        display: flex;
+        align-items: stretch;
+        gap: 0;
+      }
+      .crisp-connector {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 40px;
+        flex-shrink: 0;
+      }
+      .crisp-dot {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 700;
+        font-family: "Syne", sans-serif;
+        flex-shrink: 0;
+        z-index: 1;
+      }
+      .crisp-line {
+        width: 2px;
+        flex: 1;
+        background: var(--border);
+        margin: 2px auto;
+      }
+      .crisp-content {
+        padding: 0 0 22px 16px;
+        flex: 1;
+      }
+      .crisp-content h5 {
+        font-family: "Syne", sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        color: #fff;
+        margin-bottom: 4px;
+      }
+      .crisp-content p {
+        font-size: 13px;
+        color: var(--text-muted);
+        line-height: 1.5;
+      }
+      .crisp-content .time-badge {
+        display: inline-block;
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 4px;
+        margin-top: 4px;
+        font-family: "DM Mono", monospace;
+      }
+
+      /* ============================
+   PROFIT CHART (CSS)
+   ============================ */
+      .lift-visual {
+        display: flex;
+        align-items: flex-end;
+        gap: 4px;
+        height: 120px;
+        padding: 0 8px;
+        border-bottom: 1px solid var(--border);
+        border-left: 1px solid var(--border);
+        margin: 16px 0 8px;
+      }
+      .lift-bar {
+        flex: 1;
+        border-radius: 4px 4px 0 0;
+        transition: opacity 0.2s;
+        min-width: 20px;
+        cursor: pointer;
+        position: relative;
+      }
+      .lift-bar:hover {
+        opacity: 0.8;
+      }
+      .lift-bar::after {
+        content: attr(data-val);
+        position: absolute;
+        top: -20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 10px;
+        font-family: "DM Mono", monospace;
+        color: var(--text-muted);
+        white-space: nowrap;
+      }
+      .lift-labels {
+        display: flex;
+        gap: 4px;
+        padding: 0 8px;
+      }
+      .lift-labels span {
+        flex: 1;
+        text-align: center;
+        font-size: 10px;
+        font-family: "DM Mono", monospace;
+        color: var(--text-muted);
+        min-width: 20px;
+      }
+
+      /* ============================
+   GINI / ENTROPY METER
+   ============================ */
+      .impurity-meter {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        max-width: 480px;
+        margin: 14px 0;
+      }
+      .meter-row {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+      }
+      .meter-label {
+        font-size: 12px;
+        font-family: "DM Mono", monospace;
+        color: var(--text-muted);
+        width: 120px;
+        flex-shrink: 0;
+      }
+      .meter-bar-bg {
+        flex: 1;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .meter-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.6s ease;
+      }
+      .meter-val {
+        font-size: 12px;
+        font-family: "DM Mono", monospace;
+        color: var(--text-secondary);
+        width: 40px;
+        flex-shrink: 0;
+      }
+
+      /* ============================
+   SCROLLING PROGRESS
+   ============================ */
+      #progress-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 2px;
+        width: 0%;
+        background: linear-gradient(
+          90deg,
+          var(--c1),
+          var(--c2),
+          var(--c3),
+          var(--c4),
+          var(--c5),
+          var(--c6)
+        );
+        z-index: 1000;
+        transition: width 0.1s;
+      }
+
+      /* ============================
+   UTILITIES
+   ============================ */
+      .mt-sm {
+        margin-top: 12px;
+      }
+      .mt-md {
+        margin-top: 24px;
+      }
+      .mt-lg {
+        margin-top: 40px;
+      }
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      @media (max-width: 700px) {
+        .two-col {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .pill-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin: 12px 0;
+      }
+      .pill {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12.5px;
+        font-weight: 500;
+        border: 1px solid var(--border);
+      }
+
+      .tip-box {
+        background: rgba(245, 158, 11, 0.07);
+        border: 1px solid rgba(245, 158, 11, 0.2);
+        border-radius: 10px;
+        padding: 14px 18px;
+        font-size: 13.5px;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 16px;
+      }
+      .tip-box strong {
+        color: #f59e0b;
+      }
+
+      .danger-box {
+        background: rgba(248, 113, 113, 0.07);
+        border: 1px solid rgba(248, 113, 113, 0.2);
+        border-radius: 10px;
+        padding: 14px 18px;
+        font-size: 13.5px;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        margin-bottom: 16px;
+      }
+      .danger-box strong {
+        color: #f87171;
+      }
+
+      /* ============================
+   PRINT
+   ============================ */
+      @media print {
+        .sidebar {
+          display: none;
+        }
+        .main {
+          margin-left: 0;
+        }
+        .cheatsheet-body {
+          display: block !important;
+        }
+        body {
+          background: #fff;
+          color: #000;
+        }
+        .section {
+          border-color: #eee;
+        }
+      }
+
+      /* Animations */
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .section {
+        animation: fadeUp 0.4s ease both;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="progress-bar"></div>
+
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <div class="sidebar-logo">MD</div>
+      <a class="nav-dot active" data-topic="1" href="#s1" title="Requerimientos"
+        >01</a
+      >
+      <a class="nav-dot" data-topic="2" href="#s2" title="Ecosistema">02</a>
+      <a class="nav-dot" data-topic="3" href="#s3" title="ML Fundamentos">03</a>
+      <a class="nav-dot" data-topic="4" href="#s4" title="CRISP-DM">04</a>
+      <a class="nav-dot" data-topic="5" href="#s5" title="Evaluación">05</a>
+      <a class="nav-dot" data-topic="6" href="#s6" title="Árboles">06</a>
+    </nav>
+
+    <!-- MAIN -->
+    <main class="main">
+      <!-- HERO -->
+      <div class="hero">
+        <div class="hero-tag">
+          EXAMEN PARCIAL · MINERÍA DE DATOS · ITAM 2026
+        </div>
+        <h1>La Guía que<br /><span>sí te salva</span> en el examen</h1>
+        <p>
+          6 temas. Analogías de películas. Diagramas visuales. Quizzes de
+          autoevaluación. Sin muros de texto. Abre esto la noche anterior y
+          entra al examen con confianza.
+        </p>
+        <div class="topics-grid">
+          <a class="topic-pill" href="#s1">01 Requerimientos</a>
+          <a class="topic-pill" href="#s2">02 Ecosistema de Datos</a>
+          <a class="topic-pill" href="#s3">03 Fundamentos ML</a>
+          <a class="topic-pill" href="#s4">04 CRISP-DM</a>
+          <a class="topic-pill" href="#s5">05 Evaluación de Modelos</a>
+          <a class="topic-pill" href="#s6">06 Árboles de Decisión</a>
+        </div>
+      </div>
+
+      <!-- ============================================================
+     SECCIÓN 1: REQUERIMIENTOS COMPUTACIONALES
+     ============================================================ -->
+      <section class="section s1" id="s1">
+        <div class="section-num">TEMA 01 / 06</div>
+        <div class="section-header">
+          <div class="section-icon">💻</div>
+          <div>
+            <h2><span class="accent">Requerimientos</span> Computacionales</h2>
+            <div class="section-subtitle">
+              Entornos virtuales · Git · GitHub Codespaces · Desarrollo local
+            </div>
+          </div>
+        </div>
+
+        <div class="analogy-card">
+          <div class="analogy-emoji">🎬</div>
+          <div>
+            <h4>Analogía — La Cocina de un Restaurante</h4>
+            <p>
+              Imagina que tu computadora es una cocina. Si todos los chefs
+              (proyectos) usan los mismos ingredientes del mismo refrigerador,
+              un día alguien pone caducado el jugo de naranja y arruina TODOS
+              los platillos. Los <strong>entornos virtuales</strong> son como
+              asignarle a cada chef su propio mini-refrigerador privado con
+              exactamente los ingredientes que necesita. <strong>Git</strong> es
+              el libro de bitácora donde el chef anota cada cambio en la receta:
+              "hoy agregué más sal", "revertí al sabor del martes pasado".
+            </p>
+          </div>
+        </div>
+
+        <h3>¿Qué es un <span class="kw">Entorno Virtual</span>?</h3>
+        <p class="body-text">
+          Cuando instalas Python, es como tener una sola versión de cada libro
+          en tu librero. El problema: el Proyecto A necesita la versión 1.0 de
+          pandas y el Proyecto B necesita la versión 2.0. Si los mezclas,
+          explotan. Un <strong>entorno virtual</strong> crea un "universo
+          paralelo" aislado para cada proyecto con sus propias versiones de
+          librerías. Nada se contamina entre sí.
+        </p>
+
+        <div class="formula">
+          <span class="comment"># Crear y activar un entorno virtual</span>
+          python -m venv mi_entorno
+          <span class="comment"># Crea la caja aislada</span> source
+          mi_entorno/bin/activate
+          <span class="comment"># Entra al universo paralelo (Mac/Linux)</span>
+          mi_entorno\Scripts\activate
+          <span class="comment"># Mismo en Windows</span> pip install
+          pandas==2.0
+          <span class="comment"># Instala SOLO en este universo</span> pip
+          freeze > requirements.txt
+          <span class="comment"
+            ># Lista todos los ingredientes (para compartir)</span
+          >
+          deactivate <span class="comment"># Sal del universo paralelo</span>
+        </div>
+
+        <h3>Git — El <span class="kw">Control de Versiones</span></h3>
+        <p class="body-text">
+          Git es como el modo "deshacer" (Ctrl+Z) de Word, pero para proyectos
+          enteros y con memoria infinita. Puedes ver TODOS los cambios que
+          hiciste, volver al estado de hace 3 semanas, o trabajar en una versión
+          experimental sin tocar la versión que ya funciona. Los comandos que sí
+          te preguntan en examen:
+        </p>
+
+        <div class="formula">
+          <span class="green">git init</span>
+          <span class="comment"
+            ># Comienza a "grabar" la historia del proyecto</span
+          >
+          <span class="green">git add archivo.py</span>
+          <span class="comment"># "Prepara" el archivo para guardar</span>
+          <span class="green">git commit -m "msg"</span>
+          <span class="comment"
+            ># Toma una foto del estado actual con nota</span
+          >
+          <span class="green">git status</span>
+          <span class="comment"># ¿Qué cambió desde el último commit?</span>
+          <span class="green">git log</span>
+          <span class="comment"
+            ># Muestra el historial de todos los commits</span
+          >
+          <span class="green">git branch nueva</span>
+          <span class="comment"># Crea una línea de tiempo alternativa</span>
+          <span class="green">git merge nueva</span>
+          <span class="comment"
+            ># Fusiona la rama alternativa con la principal</span
+          >
+          <span class="green">git clone URL</span>
+          <span class="comment"># Descarga un repo existente</span>
+          <span class="green">git pull</span>
+          <span class="comment"># Descarga los cambios del servidor</span>
+          <span class="green">git push</span>
+          <span class="comment"># Sube tus cambios al servidor</span>
+        </div>
+
+        <h3>GitHub <span class="kw">Codespaces</span> vs Desarrollo Local</h3>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Característica</th>
+              <th>GitHub Codespaces ☁️</th>
+              <th>Desarrollo Local 🖥️</th>
+            </tr>
+            <tr>
+              <td><strong>¿Dónde corre?</strong></td>
+              <td>En la nube (en los servidores de GitHub)</td>
+              <td>En tu propia computadora</td>
+            </tr>
+            <tr>
+              <td><strong>Instalación</strong></td>
+              <td>Cero — ya viene todo listo</td>
+              <td>Tienes que instalar Python, librerías, Git...</td>
+            </tr>
+            <tr>
+              <td><strong>Portabilidad</strong></td>
+              <td>Funciona desde cualquier navegador, cualquier PC</td>
+              <td>Solo en tu máquina (a menos que configures igual)</td>
+            </tr>
+            <tr>
+              <td><strong>Velocidad</strong></td>
+              <td>Depende de tu internet</td>
+              <td>Rápido (usa tu CPU/RAM directamente)</td>
+            </tr>
+            <tr>
+              <td><strong>Ideal para...</strong></td>
+              <td>Colaborar en clase, empezar rápido</td>
+              <td>Proyectos grandes, trabajo serio</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="biz-card">
+          <div class="biz-tag" style="color: var(--c1)">
+            🏢 Ejemplo de Negocio
+          </div>
+          <h4>Netflix: Por qué los entornos virtuales salvan millones</h4>
+          <p>
+            El equipo de recomendaciones de Netflix tiene 200+ ingenieros
+            trabajando en el mismo sistema. Sin entornos virtuales y Git, si
+            alguien actualiza una librería, todos los modelos de recomendación
+            podrían fallar simultáneamente para 200 millones de usuarios. Con
+            Git, si algo se rompe en producción, en literalmente 30 segundos
+            hacen <code>git revert</code> y restauran la versión que funcionaba.
+            El control de versiones no es opcional — es infraestructura crítica.
+          </p>
+          <span class="roi-badge"
+            >💰 Git + entornos = sin downtime inesperado</span
+          >
+        </div>
+
+        <!-- CHEATSHEET 1 -->
+        <div class="cheatsheet">
+          <div
+            class="cheatsheet-header"
+            onclick="toggleCS(this)"
+            style="background: rgba(0, 212, 255, 0.05)"
+          >
+            <h4 style="color: var(--c1)">📋 Cheat Sheet — Requerimientos</h4>
+            <span class="cheatsheet-toggle">▼</span>
+          </div>
+          <div class="cheatsheet-body">
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c1)">→</span
+              ><span class="cs-text"
+                ><strong>Entorno virtual</strong>: universo aislado de librerías
+                por proyecto. Crea con <code>python -m venv</code>, activa con
+                <code>activate</code>.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c1)">→</span
+              ><span class="cs-text"
+                ><strong>requirements.txt</strong>: lista de dependencias
+                exactas. Se genera con
+                <code>pip freeze > requirements.txt</code> y se instala con
+                <code>pip install -r requirements.txt</code>.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c1)">→</span
+              ><span class="cs-text"
+                ><strong>Git flujo básico</strong>: init → add → commit → push.
+                El commit es la "foto" del estado actual.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c1)">→</span
+              ><span class="cs-text"
+                ><strong>Branch</strong> = línea de tiempo alternativa para
+                experimentar sin dañar el código que funciona.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c1)">→</span
+              ><span class="cs-text"
+                ><strong>Codespaces</strong>: entorno listo en la nube, sin
+                instalación. Ideal para colaborar o trabajar desde cualquier
+                dispositivo.</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="quiz-block">
+          <h4>🧠 Autoevaluación — Requerimientos</h4>
+          <div class="quiz-q">
+            <p>
+              ¿Por qué usamos entornos virtuales en lugar de instalar todo
+              globalmente?
+            </p>
+            <textarea
+              class="blank-field"
+              placeholder="Escribe tu respuesta aquí..."
+            ></textarea>
+            <button class="reveal-btn" onclick="reveal(this)">
+              Ver respuesta
+            </button>
+            <div class="quiz-answer">
+              Porque diferentes proyectos pueden necesitar versiones distintas
+              de las mismas librerías. Sin entornos virtuales, actualizar una
+              librería para el Proyecto A podría romper el Proyecto B. El
+              entorno virtual aísla las dependencias de cada proyecto en su
+              propio "universo" independiente.
+            </div>
+          </div>
+          <div class="quiz-q">
+            <p>
+              ¿Cuál es la diferencia entre <code>git add</code> y
+              <code>git commit</code>?
+            </p>
+            <textarea
+              class="blank-field"
+              placeholder="Escribe tu respuesta aquí..."
+            ></textarea>
+            <button class="reveal-btn" onclick="reveal(this)">
+              Ver respuesta
+            </button>
+            <div class="quiz-answer">
+              <strong>git add</strong> "prepara" o "selecciona" qué archivos
+              quieres incluir en la próxima foto.
+              <strong>git commit</strong> toma la foto definitiva con un mensaje
+              descriptivo. Es un proceso de dos pasos: primero decides qué
+              guardar, luego lo guardas.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+     SECCIÓN 2: ECOSISTEMA DE DATOS
+     ============================================================ -->
+      <section class="section s2" id="s2">
+        <div class="section-num">TEMA 02 / 06</div>
+        <div class="section-header">
+          <div class="section-icon">🌍</div>
+          <div>
+            <h2>El <span class="accent">Ecosistema</span> de Datos</h2>
+            <div class="section-subtitle">
+              DM vs. ML vs. IA · Valor económico · Ética y privacidad
+            </div>
+          </div>
+        </div>
+
+        <div class="analogy-card">
+          <div class="analogy-emoji">⛏️</div>
+          <div>
+            <h4>Analogía — El Minero de Oro vs. La Excavadora</h4>
+            <p>
+              La <strong>Minería de Datos</strong> es el proceso completo: el
+              geólogo estudia el terreno, decide dónde perforar, interpreta los
+              resultados y los convierte en valor. El
+              <strong>Machine Learning</strong> es la excavadora de alta
+              tecnología — una herramienta poderosa, pero sin el geólogo, solo
+              hace agujeros sin sentido. La
+              <strong>Inteligencia Artificial</strong> es el campo más amplio:
+              incluye la excavadora, los drones de exploración, los sensores
+              sísmicos y más. La excavadora (ML) es solo uno de los muchos
+              equipos disponibles.
+            </p>
+          </div>
+        </div>
+
+        <h3>Las 3 capas: <span class="kw">IA ⊃ ML ⊃ Deep Learning</span></h3>
+
+        <div class="diagram">
+          <h4>Diagrama de contenencia</h4>
+          <div style="text-align: center; padding: 10px 0">
+            <div
+              style="
+                border: 2px solid rgba(34, 197, 94, 0.4);
+                border-radius: 20px;
+                padding: 24px;
+                display: inline-block;
+                min-width: 360px;
+                background: rgba(34, 197, 94, 0.04);
+              "
+            >
+              <div
+                style="
+                  color: #22c55e;
+                  font-family: &quot;Syne&quot;, sans-serif;
+                  font-weight: 700;
+                  font-size: 14px;
+                  margin-bottom: 16px;
+                "
+              >
+                🌐 INTELIGENCIA ARTIFICIAL
+              </div>
+              <div
+                style="
+                  border: 2px solid rgba(245, 158, 11, 0.4);
+                  border-radius: 16px;
+                  padding: 18px;
+                  background: rgba(245, 158, 11, 0.04);
+                "
+              >
+                <div
+                  style="
+                    color: #f59e0b;
+                    font-family: &quot;Syne&quot;, sans-serif;
+                    font-weight: 700;
+                    font-size: 13px;
+                    margin-bottom: 14px;
+                  "
+                >
+                  🤖 MACHINE LEARNING
+                </div>
+                <div
+                  style="
+                    border: 2px solid rgba(167, 139, 250, 0.4);
+                    border-radius: 12px;
+                    padding: 12px;
+                    background: rgba(167, 139, 250, 0.04);
+                  "
+                >
+                  <div
+                    style="
+                      color: #a78bfa;
+                      font-family: &quot;Syne&quot;, sans-serif;
+                      font-weight: 700;
+                      font-size: 12px;
+                    "
+                  >
+                    🧠 DEEP LEARNING
+                  </div>
+                </div>
+              </div>
+              <div
+                style="
+                  margin-top: 12px;
+                  font-size: 12px;
+                  color: var(--text-muted);
+                "
+              >
+                La Minería de Datos <em>usa</em> ML como herramienta — no es un
+                subconjunto
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Concepto</th>
+              <th>Qué es</th>
+              <th>Pregunta que responde</th>
+              <th>Analogía</th>
+            </tr>
+            <tr>
+              <td>
+                <strong
+                  class="kw"
+                  style="background: rgba(34, 197, 94, 0.12); color: #22c55e"
+                  >Minería de Datos</strong
+                >
+              </td>
+              <td>
+                El proceso completo: define el problema, limpia datos, modela,
+                evalúa, despliega
+              </td>
+              <td>"¿Qué patrones existen en nuestros datos?"</td>
+              <td>El geólogo que diseña la excavación</td>
+            </tr>
+            <tr>
+              <td>
+                <strong
+                  class="kw"
+                  style="background: rgba(245, 158, 11, 0.12); color: #f59e0b"
+                  >Machine Learning</strong
+                >
+              </td>
+              <td>Algoritmos que aprenden de datos sin reglas explícitas</td>
+              <td>"¿Qué cliente tiene 80% de probabilidad de irse?"</td>
+              <td>La excavadora de alta tecnología</td>
+            </tr>
+            <tr>
+              <td>
+                <strong
+                  class="kw"
+                  style="background: rgba(167, 139, 250, 0.12); color: #a78bfa"
+                  >Inteligencia Artificial</strong
+                >
+              </td>
+              <td>Campo amplio: ML + visión computacional + NLP + robótica</td>
+              <td>"¿Cómo hacemos que la máquina piense como humano?"</td>
+              <td>Todo el arsenal tecnológico de la mina</td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>El Valor Económico: de Bits a <span class="kw">Dólares</span></h3>
+        <p class="body-text">
+          "Los datos son el nuevo petróleo" — pero a diferencia del petróleo,
+          los datos no se agotan. El mismo dataset puede generar valor en
+          detección de fraude, segmentación de clientes, optimización de precios
+          y predicción de churn, todo al mismo tiempo.
+        </p>
+
+        <div class="two-col">
+          <div class="biz-card">
+            <div class="biz-tag" style="color: var(--c2)">
+              📱 Telecomunicaciones
+            </div>
+            <h4>Retención de Clientes (Churn)</h4>
+            <p>
+              Modelo predice clientes con 80%+ probabilidad de cancelar. Campaña
+              de retención dirigida solo a ellos. Costo: $100/cliente. Retención
+              del 40%.
+            </p>
+            <span class="roi-badge">ROI: 920%</span>
+          </div>
+          <div class="biz-card">
+            <div class="biz-tag" style="color: var(--c2)">💳 Banca</div>
+            <h4>Detección de Fraude</h4>
+            <p>
+              Reducir pérdidas de 0.10% a 0.05% de transacciones. Para un banco
+              con $10B en transacciones anuales = ahorro de $5M cada año.
+            </p>
+            <span class="roi-badge">Ahorro: $5M/año</span>
+          </div>
+        </div>
+
+        <h3>
+          Ética y <span class="kw">Privacidad</span> — Lo que no puedes ignorar
+        </h3>
+
+        <div class="analogy-card">
+          <div class="analogy-emoji">🕷️</div>
+          <div>
+            <h4>Spider-Man lo dijo antes que el GDPR</h4>
+            <p>
+              "Un gran poder conlleva una gran responsabilidad." Cuando un
+              modelo puede predecir si alguien va a cometer un crimen,
+              enfermarse, o tener problemas financieros — eso es un poder
+              enorme. Usarlo mal tiene consecuencias reales para personas
+              reales.
+            </p>
+          </div>
+        </div>
+
+        <div class="danger-box">
+          <strong>⚠️ Caso COMPAS (EE.UU.):</strong> Un algoritmo usado para
+          predecir reincidencia criminal tenía tasas de falsos positivos
+          <em>significativamente más altas</em> para personas afroamericanas.
+          Personas reales fueron encarceladas más tiempo por culpa de un modelo
+          sesgado. Esto pasó porque los datos históricos de arrestos ya
+          contenían sesgo racial.
+        </div>
+
+        <h3>Marco Ético: Las 5 Preguntas</h3>
+        <div class="pill-row">
+          <span
+            class="pill"
+            style="border-color: rgba(34, 197, 94, 0.4); color: #22c55e"
+            >✅ Equidad</span
+          >
+          <span
+            class="pill"
+            style="border-color: rgba(0, 212, 255, 0.4); color: #00d4ff"
+            >👁️ Transparencia</span
+          >
+          <span
+            class="pill"
+            style="border-color: rgba(245, 158, 11, 0.4); color: #f59e0b"
+            >⚖️ Rendición de Cuentas</span
+          >
+          <span
+            class="pill"
+            style="border-color: rgba(167, 139, 250, 0.4); color: #a78bfa"
+            >🔒 Privacidad</span
+          >
+          <span
+            class="pill"
+            style="border-color: rgba(248, 113, 113, 0.4); color: #f87171"
+            >❤️ Beneficencia</span
+          >
+        </div>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Principio</th>
+              <th>Pregunta que debes hacerte antes de desplegar</th>
+            </tr>
+            <tr>
+              <td><strong>Equidad</strong></td>
+              <td>
+                ¿El modelo comete más errores en ciertos grupos demográficos?
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Transparencia</strong></td>
+              <td>
+                ¿Puedo explicarle al cliente por qué el modelo tomó esa
+                decisión?
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Rendición de cuentas</strong></td>
+              <td>
+                Si el modelo se equivoca y daña a alguien, ¿quién responde?
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Privacidad</strong></td>
+              <td>¿Estoy usando solo los datos estrictamente necesarios?</td>
+            </tr>
+            <tr>
+              <td><strong>Beneficencia</strong></td>
+              <td>
+                ¿Este modelo beneficia a la sociedad o solo maximiza utilidades?
+              </td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="cheatsheet">
+          <div
+            class="cheatsheet-header"
+            onclick="toggleCS(this)"
+            style="background: rgba(34, 197, 94, 0.05)"
+          >
+            <h4 style="color: var(--c2)">📋 Cheat Sheet — Ecosistema</h4>
+            <span class="cheatsheet-toggle">▼</span>
+          </div>
+          <div class="cheatsheet-body">
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c2)">→</span
+              ><span class="cs-text"
+                ><strong>Minería de Datos ≠ ML ≠ IA</strong>. MD es el proceso,
+                ML son las herramientas, IA es el campo.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c2)">→</span
+              ><span class="cs-text"
+                ><strong>Datos no = Valor</strong>. Los datos solo valen cuando
+                se convierten en decisiones accionables que impactan el
+                negocio.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c2)">→</span
+              ><span class="cs-text"
+                ><strong>Variables proxy</strong>: una variable aparentemente
+                inocua (como el código postal) puede correlacionar con raza o
+                nivel socioeconómico, generando discriminación indirecta.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c2)">→</span
+              ><span class="cs-text"
+                ><strong>Anonimización</strong> = irreversible.
+                <strong>Pseudonimización</strong> = reversible con clave. El
+                GDPR distingue entre ambas.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c2)">→</span
+              ><span class="cs-text"
+                ><strong>Ingeniero en Negocios</strong> = traductor entre el
+                mundo técnico y el mundo de negocio. No optimiza algoritmos;
+                genera valor medible.</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="quiz-block">
+          <h4>🧠 Autoevaluación — Ecosistema</h4>
+          <div class="quiz-q">
+            <p>
+              ¿Cuál es la diferencia entre Minería de Datos y Machine Learning?
+              Da un ejemplo de cómo se relacionan.
+            </p>
+            <textarea
+              class="blank-field"
+              placeholder="Escribe tu respuesta aquí..."
+            ></textarea>
+            <button class="reveal-btn" onclick="reveal(this)">
+              Ver respuesta
+            </button>
+            <div class="quiz-answer">
+              La <strong>Minería de Datos</strong> es el proceso completo (KDD):
+              entender el negocio, explorar los datos, limpiarlos, modelar,
+              evaluar y desplegar. El <strong>Machine Learning</strong> son los
+              algoritmos que se usan como herramienta dentro de ese proceso (en
+              la fase de modelado). Ejemplo: un proyecto para reducir churn en
+              una telco es Minería de Datos; el modelo de regresión logística
+              que entrenas para predecir quién se va es Machine Learning.
+            </div>
+          </div>
+          <div class="quiz-q">
+            <p>
+              ¿Por qué los datos históricos pueden generar modelos sesgados? Da
+              un ejemplo concreto.
+            </p>
+            <textarea
+              class="blank-field"
+              placeholder="Escribe tu respuesta aquí..."
+            ></textarea>
+            <button class="reveal-btn" onclick="reveal(this)">
+              Ver respuesta
+            </button>
+            <div class="quiz-answer">
+              Porque el modelo aprende patrones de los datos históricos, y si
+              esos datos reflejan decisiones humanas pasadas que eran
+              discriminatorias, el modelo perpetúa y amplifica ese sesgo.
+              Ejemplo: Amazon entrenó un modelo de reclutamiento con CVs de
+              empleados pasados (mayoritariamente hombres) y el modelo aprendió
+              a penalizar CVs que mencionaban la palabra "mujer".
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+     SECCIÓN 3: FUNDAMENTOS DE ML
+     ============================================================ -->
+      <section class="section s3" id="s3">
+        <div class="section-num">TEMA 03 / 06</div>
+        <div class="section-header">
+          <div class="section-icon">🔬</div>
+          <div>
+            <h2>Fundamentos de <span class="accent">Machine Learning</span></h2>
+            <div class="section-subtitle">
+              Supervisado vs No Supervisado · Sesgo-Varianza · Regresión ·
+              K-Means
+            </div>
+          </div>
+        </div>
+
+        <div class="analogy-card">
+          <div class="analogy-emoji">🎓</div>
+          <div>
+            <h4>Analogía — El Estudiante y el Examen</h4>
+            <p>
+              El ML aprende de datos así como tú aprendes de ejemplos. El
+              riesgo: un estudiante que
+              <strong>memoriza las respuestas exactas del simulacro</strong>
+              (overfitting) saca 100 en la práctica pero 50 en el examen real.
+              Un estudiante que
+              <strong>entiende los principios</strong> (generalización) saca 85
+              en ambos. El objetivo no es memorizar — es aprender la estructura
+              subyacente.
+            </p>
+          </div>
+        </div>
+
+        <h3>La ecuación base: <span class="kw">y = f(x) + ε</span></h3>
+        <div class="formula">
+          y = <span class="highlight">f(x)</span> + <span class="red">ε</span>
+
+          y = lo que queremos predecir (ventas, fraude, churn)
+          <span class="highlight">f(x)</span> = la función REAL y desconocida de
+          la realidad <span class="red">ε</span> = error irreducible (ruido
+          aleatorio, lo que no podemos medir) El ML construye
+          <span class="green">f̂(x)</span> — una aproximación de f(x) usando
+          datos históricos Meta: que <span class="green">f̂(x)</span> sea tan
+          buena que funcione en datos NUEVOS
+        </div>
+
+        <h3>Supervisado vs. <span class="kw">No Supervisado</span></h3>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Característica</th>
+              <th>Aprendizaje Supervisado 👨‍🏫</th>
+              <th>No Supervisado 🔍</th>
+            </tr>
+            <tr>
+              <td><strong>Datos</strong></td>
+              <td>Etiquetados: tenemos (x, y)</td>
+              <td>Sin etiqueta: solo tenemos x</td>
+            </tr>
+            <tr>
+              <td><strong>Objetivo</strong></td>
+              <td>Predecir y para nuevos x</td>
+              <td>Descubrir estructura oculta en x</td>
+            </tr>
+            <tr>
+              <td><strong>Pregunta</strong></td>
+              <td>"¿Este cliente va a irse?" (Sí/No)</td>
+              <td>"¿Qué tipos de clientes existen?"</td>
+            </tr>
+            <tr>
+              <td><strong>Evaluación</strong></td>
+              <td>Fácil: comparas predicho vs. real</td>
+              <td>Difícil: no hay "respuesta correcta"</td>
+            </tr>
+            <tr>
+              <td><strong>Ejemplos</strong></td>
+              <td>Clasificación, Regresión</td>
+              <td>Clustering, Detección de anomalías</td>
+            </tr>
+            <tr>
+              <td><strong>Algoritmos</strong></td>
+              <td>Reg. Logística, Árboles, XGBoost</td>
+              <td>K-Means, Clustering jerárquico</td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>
+          El Dilema <span class="kw">Sesgo-Varianza</span> — Lo más importante
+          del curso
+        </h3>
+        <div class="analogy-card">
+          <div class="analogy-emoji">🎯</div>
+          <div>
+            <h4>Analogía — El Arquero</h4>
+            <p>
+              <strong>Alto Sesgo (underfitting)</strong>: tus flechas caen
+              siempre en el mismo lugar... pero muy lejos del centro. El arco
+              está mal calibrado. <strong>Alta Varianza (overfitting)</strong>:
+              tus flechas están dispersas por todas partes — a veces pegas en el
+              centro, a veces en el árbol de al lado. No hay consistencia.
+              <strong>Modelo óptimo</strong>: flechas concentradas cerca del
+              centro. Bajo error sistemático, baja dispersión.
+            </p>
+          </div>
+        </div>
+
+        <div class="formula">
+          Error Total = <span class="red">Sesgo²</span> +
+          <span class="blue">Varianza</span> +
+          <span class="purple">Error Irreducible (ε)</span>
+
+          <span class="red">Sesgo alto (Underfitting)</span>: → Modelo demasiado
+          SIMPLE → Mal en entrenamiento Y en prueba → Solución: usar modelo más
+          complejo
+
+          <span class="blue">Varianza alta (Overfitting)</span>: → Modelo
+          demasiado COMPLEJO — memoriza el ruido → Excelente en entrenamiento,
+          pésimo en prueba → Solución: regularización, validación cruzada, poda
+          ⚖️ Objetivo: encontrar el punto donde Sesgo² + Varianza es mínimo
+        </div>
+
+        <div class="bv-diagram">
+          <div
+            class="bv-box"
+            style="
+              border-color: rgba(248, 113, 113, 0.3);
+              background: rgba(248, 113, 113, 0.05);
+            "
+          >
+            <h5 style="color: #f87171">Underfitting (Sesgo alto)</h5>
+            <p>
+              El modelo es demasiado simple. Un árbol de solo 1 nivel. Una línea
+              recta para un patrón curvo. No captura la complejidad real de los
+              datos.
+            </p>
+          </div>
+          <div
+            class="bv-box"
+            style="
+              border-color: rgba(52, 211, 153, 0.3);
+              background: rgba(52, 211, 153, 0.05);
+            "
+          >
+            <h5 style="color: #34d399">Punto óptimo ✓</h5>
+            <p>
+              El modelo generaliza bien a datos nuevos. Good performance en
+              entrenamiento y en prueba. El santo grial.
+            </p>
+          </div>
+          <div
+            class="bv-box"
+            style="
+              border-color: rgba(167, 139, 250, 0.3);
+              background: rgba(167, 139, 250, 0.05);
+            "
+          >
+            <h5 style="color: #a78bfa">Overfitting (Varianza alta)</h5>
+            <p>
+              El modelo memorizó el ruido. 99% en entrenamiento, 60% en prueba.
+              Un árbol con 50 niveles de profundidad.
+            </p>
+          </div>
+        </div>
+
+        <h3>
+          Regresión Lineal — Para predecir <span class="kw">números</span>
+        </h3>
+        <div class="formula">
+          y = β₀ + β₁x₁ + β₂x₂ + ... + βₙxₙ + ε β₀ = intersección (valor de y
+          cuando todo es cero) βᵢ = coeficiente: "por cada +1 en xᵢ, y cambia βᵢ
+          unidades" Ejemplo: β_marketing = 0.75 → "Por cada $1,000 extra en
+          marketing → $750 más en ventas" OLS (Mínimos Cuadrados): minimiza
+          Σ(y_real - y_predicho)² Métricas: R² = 0.85 → el modelo explica el 85%
+          de la variabilidad RMSE = error promedio en unidades de y (penaliza
+          errores grandes) MAE = error absoluto promedio (más robusto a
+          outliers) Regularización: Ridge (L2): penaliza β² → reduce
+          coeficientes pero no los elimina Lasso (L1): penaliza |β| → puede
+          forzar coeficientes a exactamente 0 → Lasso = selección automática de
+          variables
+        </div>
+
+        <h3>
+          Regresión Logística — Para predecir
+          <span class="kw">probabilidades</span>
+        </h3>
+        <div class="formula">
+          <span class="comment"
+            ># Clasifica en categorías (Sí/No, Fraude/Legítimo, Churn/No
+            Churn)</span
+          >
+          P(y=1) = 1 / (1 + e^-(β₀ + β₁x))
+          <span class="comment">← Función Sigmoide</span>
+
+          Salida: un número entre 0 y 1 (una PROBABILIDAD) No dice "este cliente
+          se va" — dice "tiene 78% de probabilidad de irse" Umbral de decisión:
+          Si P(y=1) > 0.5 → predice "SÍ" (default) Puedes ajustarlo: umbral 0.2
+          en fraude = más sensible = menos fraudes perdidos
+        </div>
+
+        <h3>K-Means — Para <span class="kw">agrupar</span> sin etiquetas</h3>
+        <div class="formula">
+          Algoritmo iterativo de 4 pasos: 1.
+          <span class="green">Inicializar</span>: coloca K centroides al azar 2.
+          <span class="blue">Asignar</span>: cada punto va al centroide más
+          cercano 3. <span class="highlight">Actualizar</span>: mueve el
+          centroide al promedio de su grupo 4.
+          <span class="purple">Repetir</span> pasos 2-3 hasta que no haya
+          cambios (convergencia) ⚠️ CRÍTICO: SIEMPRE normaliza los datos antes
+          de K-Means Sin normalización, la variable con mayor escala domina todo
+          (ingresos en miles vs. edad en decenas → K-Means ignora la edad)
+          Selección de K: Método del Codo: grafica inercia vs. K, busca el
+          "codo" de la curva Silhouette Score: cercano a 1 = clusters bien
+          definidos
+        </div>
+
+        <div class="biz-card">
+          <div class="biz-tag" style="color: var(--c3)">
+            🛒 Ejemplo Retail — K-Means en acción
+          </div>
+          <h4>Segmentación de clientes en Walmart</h4>
+          <p>
+            Walmart aplica K-Means sobre variables de compra (frecuencia, ticket
+            promedio, horario, categorías). Resultado: 4 segmentos: "Cazadores
+            de ofertas", "Compradores de conveniencia", "Familias con
+            presupuesto", "Compradores premium". Cada segmento recibe
+            promociones diferentes. Sin el modelo, enviarían el mismo cupón de
+            descuento a todos — malgastando dinero en quienes de todas formas
+            compran sin descuento.
+          </p>
+          <span class="roi-badge"
+            >💰 Marketing personalizado = +15-25% en conversión</span
+          >
+        </div>
+
+        <div class="cheatsheet">
+          <div
+            class="cheatsheet-header"
+            onclick="toggleCS(this)"
+            style="background: rgba(245, 158, 11, 0.05)"
+          >
+            <h4 style="color: var(--c3)">📋 Cheat Sheet — Fundamentos ML</h4>
+            <span class="cheatsheet-toggle">▼</span>
+          </div>
+          <div class="cheatsheet-body">
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c3)">→</span
+              ><span class="cs-text"
+                ><strong>Supervisado</strong> = datos con etiqueta (y).
+                <strong>No supervisado</strong> = sin etiqueta, descubres
+                estructura.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c3)">→</span
+              ><span class="cs-text"
+                ><strong>Sesgo alto</strong> = modelo muy simple = underfitting.
+                <strong>Varianza alta</strong> = modelo muy complejo =
+                overfitting.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c3)">→</span
+              ><span class="cs-text"
+                ><strong>Ridge</strong>: penaliza β² → nunca elimina variables.
+                <strong>Lasso</strong>: penaliza |β| → puede eliminar variables
+                (selección automática).</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c3)">→</span
+              ><span class="cs-text"
+                ><strong>Regresión Logística</strong> no es regresión — es
+                clasificación. Su salida es una probabilidad [0,1].</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c3)">→</span
+              ><span class="cs-text"
+                ><strong>K-Means</strong>: siempre normalizar primero. El número
+                K se elige con el Método del Codo.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c3)">→</span
+              ><span class="cs-text"
+                ><strong>Curva ROC</strong>: Eje X = FPR (falsos positivos), Eje
+                Y = Recall. AUC=0.5 es aleatorio, AUC=1.0 es perfecto.</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="quiz-block">
+          <h4>🧠 Autoevaluación — ML Fundamentos</h4>
+          <div class="quiz-q">
+            <p>
+              Explica el trade-off Sesgo-Varianza con la analogía del arquero.
+              ¿Qué significa underfitting y overfitting en términos prácticos?
+            </p>
+            <textarea
+              class="blank-field"
+              placeholder="Escribe tu respuesta aquí..."
+            ></textarea>
+            <button class="reveal-btn" onclick="reveal(this)">
+              Ver respuesta
+            </button>
+            <div class="quiz-answer">
+              <strong>Sesgo alto (underfitting)</strong>: el arquero siempre
+              falla en el mismo lugar, lejos del centro. El modelo es demasiado
+              simple y no captura la complejidad real — falla tanto en
+              entrenamiento como en prueba.
+              <strong>Varianza alta (overfitting)</strong>: el arquero a veces
+              da en el centro y a veces ni cerca — sin consistencia. El modelo
+              memorizó el ruido de los datos de entrenamiento y no generaliza a
+              datos nuevos: 99% en entrenamiento, 60% en prueba.
+            </div>
+          </div>
+          <div class="quiz-q">
+            <p>
+              ¿Por qué es crítico normalizar los datos antes de aplicar K-Means?
+              ¿Qué pasaría si no lo haces?
+            </p>
+            <textarea
+              class="blank-field"
+              placeholder="Escribe tu respuesta aquí..."
+            ></textarea>
+            <button class="reveal-btn" onclick="reveal(this)">
+              Ver respuesta
+            </button>
+            <div class="quiz-answer">
+              K-Means usa distancias euclidianas. Si una variable tiene escala
+              grande (ingresos: $20,000-$100,000) y otra tiene escala pequeña
+              (edad: 18-65), la diferencia de $10,000 en ingresos numéricamente
+              "aplasta" la diferencia de 40 años en edad. Sin normalización, el
+              algoritmo agrupará solo por ingresos, ignorando totalmente la
+              edad. Los clusters resultantes serán inútiles para el negocio.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+     SECCIÓN 4: CRISP-DM
+     ============================================================ -->
+      <section class="section s4" id="s4">
+        <div class="section-num">TEMA 04 / 06</div>
+        <div class="section-header">
+          <div class="section-icon">🔄</div>
+          <div>
+            <h2>Metodología <span class="accent">CRISP-DM</span></h2>
+            <div class="section-subtitle">
+              Las 6 fases del ciclo de vida · Naturaleza iterativa
+            </div>
+          </div>
+        </div>
+
+        <div class="analogy-card">
+          <div class="analogy-emoji">🎬</div>
+          <div>
+            <h4>Analogía — Producir una Película de Hollywood</h4>
+            <p>
+              Nadie empieza a filmar sin un guión. CRISP-DM es como producir una
+              película: primero entiendes qué historia quieres contar (Negocio),
+              revisas si tienes las locaciones y actores disponibles (Datos),
+              preparas el set y ensayas (Preparación), filmas (Modelado),
+              revisas los rushes con el director (Evaluación) y la estrenas al
+              público (Despliegue). Y si la audiencia de prueba odia el final,
+              <strong>vuelves a filmar</strong> — el proceso es iterativo.
+            </p>
+          </div>
+        </div>
+
+        <div class="diagram">
+          <h4>Las 6 Fases de CRISP-DM — Flujo y tiempo</h4>
+          <div class="crisp-flow">
+            <div class="crisp-phase">
+              <div class="crisp-connector">
+                <div
+                  class="crisp-dot"
+                  style="
+                    background: rgba(167, 139, 250, 0.2);
+                    color: #a78bfa;
+                    border: 2px solid #a78bfa;
+                  "
+                >
+                  1
+                </div>
+                <div class="crisp-line"></div>
+              </div>
+              <div class="crisp-content">
+                <h5>🎯 Entendimiento del Negocio</h5>
+                <p>
+                  ¿Qué problema queremos resolver? ¿Cuál es el objetivo medible?
+                  Traducir: "reducir fraude" → "clasificador con Recall > 90%"
+                </p>
+                <span
+                  class="time-badge"
+                  style="background: rgba(167, 139, 250, 0.1); color: #a78bfa"
+                  >La fase más crítica — define todo lo demás</span
+                >
+              </div>
+            </div>
+            <div class="crisp-phase">
+              <div class="crisp-connector">
+                <div
+                  class="crisp-dot"
+                  style="
+                    background: rgba(0, 212, 255, 0.2);
+                    color: #00d4ff;
+                    border: 2px solid #00d4ff;
+                  "
+                >
+                  2
+                </div>
+                <div class="crisp-line"></div>
+              </div>
+              <div class="crisp-content">
+                <h5>🔍 Entendimiento de los Datos (EDA)</h5>
+                <p>
+                  Explorar, visualizar, detectar valores faltantes, outliers,
+                  correlaciones. Principio: "Garbage In, Garbage Out"
+                </p>
+                <span
+                  class="time-badge"
+                  style="background: rgba(0, 212, 255, 0.1); color: #00d4ff"
+                  >~10-15% del proyecto</span
+                >
+              </div>
+            </div>
+            <div class="crisp-phase">
+              <div class="crisp-connector">
+                <div
+                  class="crisp-dot"
+                  style="
+                    background: rgba(245, 158, 11, 0.2);
+                    color: #f59e0b;
+                    border: 2px solid #f59e0b;
+                  "
+                >
+                  3
+                </div>
+                <div class="crisp-line"></div>
+              </div>
+              <div class="crisp-content">
+                <h5>🧹 Preparación de los Datos</h5>
+                <p>
+                  Limpieza, ingeniería de características (RFM), codificación de
+                  variables categóricas. Eliminar duplicados, tratar nulos.
+                </p>
+                <span
+                  class="time-badge"
+                  style="background: rgba(245, 158, 11, 0.15); color: #f59e0b"
+                  >⏱️ 60-80% del tiempo total del proyecto</span
+                >
+              </div>
+            </div>
+            <div class="crisp-phase">
+              <div class="crisp-connector">
+                <div
+                  class="crisp-dot"
+                  style="
+                    background: rgba(34, 197, 94, 0.2);
+                    color: #22c55e;
+                    border: 2px solid #22c55e;
+                  "
+                >
+                  4
+                </div>
+                <div class="crisp-line"></div>
+              </div>
+              <div class="crisp-content">
+                <h5>🤖 Modelado</h5>
+                <p>
+                  Seleccionar y entrenar algoritmos. Ajustar hiperparámetros.
+                  Validación cruzada para evitar overfitting.
+                </p>
+                <span
+                  class="time-badge"
+                  style="background: rgba(34, 197, 94, 0.1); color: #22c55e"
+                  >~10-15% del proyecto</span
+                >
+              </div>
+            </div>
+            <div class="crisp-phase">
+              <div class="crisp-connector">
+                <div
+                  class="crisp-dot"
+                  style="
+                    background: rgba(248, 113, 113, 0.2);
+                    color: #f87171;
+                    border: 2px solid #f87171;
+                  "
+                >
+                  5
+                </div>
+                <div class="crisp-line"></div>
+              </div>
+              <div class="crisp-content">
+                <h5>📊 Evaluación</h5>
+                <p>
+                  ¿El modelo alcanza los objetivos de negocio? No solo métricas
+                  técnicas (AUC) — también financieras (¿cuánto dinero genera?).
+                </p>
+                <span
+                  class="time-badge"
+                  style="background: rgba(248, 113, 113, 0.1); color: #f87171"
+                  >Punto de decisión: ¿desplegar o iterar?</span
+                >
+              </div>
+            </div>
+            <div class="crisp-phase">
+              <div class="crisp-connector">
+                <div
+                  class="crisp-dot"
+                  style="
+                    background: rgba(52, 211, 153, 0.2);
+                    color: #34d399;
+                    border: 2px solid #34d399;
+                  "
+                >
+                  6
+                </div>
+                <div class="crisp-line" style="opacity: 0"></div>
+              </div>
+              <div class="crisp-content">
+                <h5>🚀 Despliegue</h5>
+                <p>
+                  Implementar en producción. Monitorear degradación del modelo.
+                  Planificar reentrenamiento periódico.
+                </p>
+                <span
+                  class="time-badge"
+                  style="background: rgba(52, 211, 153, 0.1); color: #34d399"
+                  >No es el final — es el inicio del siguiente ciclo</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="tip-box">
+          <strong>💡 El secreto de CRISP-DM:</strong> El proceso no es lineal —
+          es un ciclo. Cuando modelas y descubres que faltan variables
+          importantes, vuelves a la Fase 2. Cuando evalúas y el modelo no
+          alcanza los objetivos de negocio, vuelves a la Fase 1 para redefinir
+          el problema. Esta iteración es lo que hace que los proyectos de datos
+          mejoren con el tiempo.
+        </div>
+
+        <h3>La Traducción <span class="kw">Negocio → Minería</span></h3>
+        <p class="body-text">
+          La habilidad más importante del Fase 1 es convertir el lenguaje del
+          negocio en objetivos técnicos medibles:
+        </p>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Objetivo de Negocio</th>
+              <th>Objetivo de Minería de Datos</th>
+              <th>Tipo de problema</th>
+            </tr>
+            <tr>
+              <td>"Reducir el fraude en tarjetas"</td>
+              <td>Clasificador binario con Recall ≥ 90% y FPR ≤ 2%</td>
+              <td>Clasificación</td>
+            </tr>
+            <tr>
+              <td>"Entender mejor a mis clientes"</td>
+              <td>
+                K-Means con Silhouette ≥ 0.5 y 3-5 segmentos interpretables
+              </td>
+              <td>Clustering</td>
+            </tr>
+            <tr>
+              <td>"Predecir ventas del próximo mes"</td>
+              <td>Modelo de regresión con MAPE ≤ 10% en test</td>
+              <td>Regresión</td>
+            </tr>
+            <tr>
+              <td>"Retener más clientes"</td>
+              <td>Modelo de churn con AUC ≥ 0.85 y Lift ≥ 3 en decil 1</td>
+              <td>Clasificación</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="cheatsheet">
+          <div
+            class="cheatsheet-header"
+            onclick="toggleCS(this)"
+            style="background: rgba(167, 139, 250, 0.05)"
+          >
+            <h4 style="color: var(--c4)">📋 Cheat Sheet — CRISP-DM</h4>
+            <span class="cheatsheet-toggle">▼</span>
+          </div>
+          <div class="cheatsheet-body">
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c4)">→</span
+              ><span class="cs-text"
+                ><strong>6 fases</strong>: Negocio → Datos → Preparación →
+                Modelado → Evaluación → Despliegue.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c4)">→</span
+              ><span class="cs-text"
+                ><strong>Fase 3</strong> consume 60-80% del tiempo real. Los
+                datos siempre están sucios.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c4)">→</span
+              ><span class="cs-text"
+                ><strong>No es lineal</strong>: puedes (y debes) regresar a
+                fases anteriores cuando descubres nueva información.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c4)">→</span
+              ><span class="cs-text"
+                ><strong>Garbage In, Garbage Out</strong>: si los datos de
+                entrada son basura, el modelo también lo será. Por eso la Fase 2
+                es crítica.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c4)">→</span
+              ><span class="cs-text"
+                ><strong>RFM</strong> = Recency (cuánto tiempo sin comprar),
+                Frequency (frecuencia), Monetary (valor monetario). Ingeniería
+                de características en Fase 3.</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="quiz-block">
+          <h4>🧠 Autoevaluación — CRISP-DM</h4>
+          <div class="quiz-q">
+            <p>
+              ¿Por qué la Fase de Preparación de Datos consume el 60-80% del
+              tiempo del proyecto? ¿Qué se hace en ella?
+            </p>
+            <textarea
+              class="blank-field"
+              placeholder="Escribe tu respuesta aquí..."
+            ></textarea>
+            <button class="reveal-btn" onclick="reveal(this)">
+              Ver respuesta
+            </button>
+            <div class="quiz-answer">
+              En el mundo real, los datos vienen de múltiples fuentes, en
+              formatos distintos, con errores, duplicados, valores faltantes e
+              inconsistencias. La Fase 3 incluye: limpieza (eliminar duplicados,
+              tratar valores nulos), ingeniería de características (crear nuevas
+              variables como RFM), codificación de variables categóricas
+              (convertir "Ciudad" en números que el modelo entienda), y
+              normalización. Es un proceso manual, iterativo y que requiere
+              conocimiento del dominio de negocio.
+            </div>
+          </div>
+          <div class="quiz-q">
+            <p>
+              Traduce este objetivo de negocio a un objetivo técnico de minería:
+              "Quiero que menos clientes abandonen mi plataforma de streaming."
+            </p>
+            <textarea
+              class="blank-field"
+              placeholder="Escribe tu respuesta aquí..."
+            ></textarea>
+            <button class="reveal-btn" onclick="reveal(this)">
+              Ver respuesta
+            </button>
+            <div class="quiz-answer">
+              Objetivo técnico: "Desarrollar un modelo de clasificación binaria
+              (churn: Sí/No) con AUC ≥ 0.82 en datos de prueba, que identifique
+              correctamente al menos el 75% de los clientes que cancelarán en
+              los próximos 30 días (Recall ≥ 0.75), para lanzar campañas de
+              retención dirigidas a los 3 deciles superiores de riesgo."
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+     SECCIÓN 5: EVALUACIÓN DE MODELOS
+     ============================================================ -->
+      <section class="section s5" id="s5">
+        <div class="section-num">TEMA 05 / 06</div>
+        <div class="section-header">
+          <div class="section-icon">📊</div>
+          <div>
+            <h2>
+              Evaluación de Modelos como
+              <span class="accent">Herramienta Financiera</span>
+            </h2>
+            <div class="section-subtitle">
+              Matriz de Confusión · Paradoja de Accuracy · ROC/PR · Lift ·
+              Profit Curves
+            </div>
+          </div>
+        </div>
+
+        <div class="analogy-card">
+          <div class="analogy-emoji">🩺</div>
+          <div>
+            <h4>Analogía — El Doctor y el Diagnóstico</h4>
+            <p>
+              Un doctor que dice "estás sano" a TODOS los pacientes tendría 99%
+              de "exactitud" (accuracy) si solo el 1% tiene cáncer. Pero ese
+              doctor es <strong>inútil</strong> porque el 1% de casos graves son
+              exactamente los que necesita detectar. La accuracy sola no mide si
+              un modelo hace lo que necesitamos. Necesitamos métricas que
+              reflejen <strong>el costo real de equivocarse</strong>.
+            </p>
+          </div>
+        </div>
+
+        <h3>La <span class="kw">Matriz de Confusión</span></h3>
+        <div class="diagram">
+          <h4>Las 4 celdas — cada una tiene un costo diferente</h4>
+          <div class="cm-grid">
+            <div class="cm-cell cm-header"></div>
+            <div class="cm-cell cm-header">Predicho: NO</div>
+            <div class="cm-cell cm-header">Predicho: SÍ</div>
+            <div class="cm-cell cm-header">Real: NO</div>
+            <div class="cm-cell cm-tn">
+              TN<br /><span style="font-size: 11px; opacity: 0.7"
+                >Correcto ✓<br />Legítimo detectado</span
+              >
+            </div>
+            <div class="cm-cell cm-fp">
+              FP<br /><span style="font-size: 11px; opacity: 0.7"
+                >Falsa Alarma<br />Molesta al cliente</span
+              >
+            </div>
+            <div class="cm-cell cm-header">Real: SÍ</div>
+            <div class="cm-cell cm-fn">
+              FN<br /><span style="font-size: 11px; opacity: 0.7"
+                >Miss ❌<br />Fraude no detectado</span
+              >
+            </div>
+            <div class="cm-cell cm-tp">
+              TP<br /><span style="font-size: 11px; opacity: 0.7"
+                >Correcto ✓<br />Fraude detectado</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="formula">
+          Accuracy = (TP + TN) / Total
+          <span class="comment">← TRAMPA en clases desbalanceadas</span>
+          <span class="green">Precision</span> = TP / (TP + FP)
+          <span class="comment">← De lo que dije "sí", ¿cuánto era sí?</span>
+          <span class="blue">Recall</span> = TP / (TP + FN)
+          <span class="comment"
+            >← De todos los sí reales, ¿cuántos atrapé?</span
+          >
+          F1-Score = 2 × (Precision × Recall) / (Precision + Recall) FPR = FP /
+          (FP + TN) <span class="comment">← Tasa de falsas alarmas</span>
+        </div>
+
+        <h3>
+          La <span class="kw">Paradoja de la Exactitud</span> — El engaño
+          estadístico
+        </h3>
+        <div class="danger-box">
+          <strong>⚠️ El engaño:</strong> 1000 transacciones: 990 legítimas, 10
+          fraudulentas. Un modelo que siempre dice "legítimo" tiene
+          <strong>accuracy = 99%</strong>. Pero Recall = 0% — no detectó ni UN
+          solo fraude. Tu "increíble" modelo de 99% es completamente inútil. La
+          accuracy es una mentira estadística cuando las clases están
+          desbalanceadas.
+        </div>
+
+        <h3>
+          ¿Cuándo priorizar <span class="kw">Precision</span> vs
+          <span class="kw">Recall</span>?
+        </h3>
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Situación</th>
+              <th>¿Qué error es más caro?</th>
+              <th>Prioriza</th>
+              <th>¿Por qué?</th>
+            </tr>
+            <tr>
+              <td>Detección de fraude bancario</td>
+              <td>FN (no detectar el fraude = pierdes $5,000)</td>
+              <td><strong style="color: #34d399">Recall</strong></td>
+              <td>
+                Mejor bloquear algunas tarjetas legítimas que perder dinero
+              </td>
+            </tr>
+            <tr>
+              <td>Filtro de spam</td>
+              <td>FP (bloquear email importante)</td>
+              <td><strong style="color: #60a5fa">Precision</strong></td>
+              <td>Mejor dejar pasar spam que bloquear un email del jefe</td>
+            </tr>
+            <tr>
+              <td>Diagnóstico de cáncer</td>
+              <td>FN (no detectar cáncer real)</td>
+              <td><strong style="color: #34d399">Recall</strong></td>
+              <td>Mejor hacer biopsia innecesaria que perder un caso</td>
+            </tr>
+            <tr>
+              <td>Recomendación de productos</td>
+              <td>FP (recomendar algo irrelevante)</td>
+              <td><strong style="color: #60a5fa">Precision</strong></td>
+              <td>Mejor no recomendar nada que recomendar basura</td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>
+          <span class="kw">Curva ROC</span> vs Curva
+          <span class="kw">Precision-Recall</span>
+        </h3>
+        <div class="formula">
+          Curva ROC: Eje X = FPR (Tasa de Falsos Positivos) Eje Y = Recall
+          (Sensibilidad) AUC = 0.5 → modelo aleatorio (inútil) AUC = 1.0 →
+          modelo perfecto AUC = 0.87 → "detecta 87% de fraudes revisando el 50%
+          más sospechoso" Curva Precision-Recall: Eje X = Recall, Eje Y =
+          Precision Mejor cuando las clases están MUY desbalanceadas (ej: 1%
+          positivos) ¿Cuándo usar cuál? Clases BALANCEADAS → ROC-AUC Clases
+          DESBALANCEADAS → PR-AUC (ROC puede ser engañosa)
+        </div>
+
+        <h3>
+          Análisis de <span class="kw">Deciles</span> y Curva de
+          <span class="kw">Lift</span>
+        </h3>
+        <p class="body-text">
+          Ordena a los clientes de mayor a menor probabilidad predicha. Divide
+          en 10 grupos iguales (deciles). El Lift te dice cuánto mejor es el
+          modelo que disparar al azar:
+        </p>
+
+        <div class="diagram">
+          <h4>Ejemplo — Lift por Decil (campaña de marketing)</h4>
+          <div class="lift-visual">
+            <div
+              class="lift-bar"
+              style="height: 100%; background: rgba(248, 113, 113, 0.6)"
+              data-val="Lift 4.8x"
+            ></div>
+            <div
+              class="lift-bar"
+              style="height: 83%; background: rgba(245, 158, 11, 0.6)"
+              data-val="3.9x"
+            ></div>
+            <div
+              class="lift-bar"
+              style="height: 65%; background: rgba(245, 158, 11, 0.5)"
+              data-val="3.1x"
+            ></div>
+            <div
+              class="lift-bar"
+              style="height: 48%; background: rgba(34, 197, 94, 0.5)"
+              data-val="2.3x"
+            ></div>
+            <div
+              class="lift-bar"
+              style="height: 35%; background: rgba(34, 197, 94, 0.4)"
+              data-val="1.7x"
+            ></div>
+            <div
+              class="lift-bar"
+              style="height: 25%; background: rgba(52, 211, 153, 0.4)"
+              data-val="1.2x"
+            ></div>
+            <div
+              class="lift-bar"
+              style="height: 18%; background: rgba(96, 165, 250, 0.4)"
+              data-val="0.9x"
+            ></div>
+            <div
+              class="lift-bar"
+              style="height: 14%; background: rgba(96, 165, 250, 0.3)"
+              data-val="0.7x"
+            ></div>
+            <div
+              class="lift-bar"
+              style="height: 10%; background: rgba(167, 139, 250, 0.3)"
+              data-val="0.5x"
+            ></div>
+            <div
+              class="lift-bar"
+              style="height: 7%; background: rgba(167, 139, 250, 0.2)"
+              data-val="0.3x"
+            ></div>
+          </div>
+          <div class="lift-labels">
+            <span>D1</span><span>D2</span><span>D3</span><span>D4</span
+            ><span>D5</span> <span>D6</span><span>D7</span><span>D8</span
+            ><span>D9</span><span>D10</span>
+          </div>
+          <p
+            style="font-size: 12px; color: var(--text-muted); margin-top: 10px"
+          >
+            Lift = 4.8 en Decil 1 → al contactar el 10% más probable, capturas
+            4.8 veces más positivos que al azar
+          </p>
+        </div>
+
+        <h3>
+          Matriz de Confusión como <span class="kw">Estado de Resultados</span>
+        </h3>
+        <div class="formula">
+          Asigna costos reales a cada celda: TP: +$5,000 (fraude detectado →
+          dinero recuperado) TN: $0 (transacción legítima correctamente
+          aprobada) FP: -$10 (cliente molesto por bloqueo innecesario) FN:
+          -$5,000 (fraude no detectado → pérdida directa) Valor Esperado del
+          modelo: VE = TP×V(TP) + TN×V(TN) + FP×V(FP) + FN×V(FN) = 80(5000) +
+          900(0) + 20(-10) + 10(-5000) = 400,000 + 0 - 200 - 50,000 =
+          <span class="green">$349,800</span> ← valor generado por el modelo
+          Profit Curve: Grafica la ganancia vs. el % de población contactada
+          Forma de montaña: sube cuando los positivos superan los costos, baja
+          cuando contactamos cada vez más negativos El PICO = umbral óptimo de
+          decisión
+        </div>
+
+        <div class="cheatsheet">
+          <div
+            class="cheatsheet-header"
+            onclick="toggleCS(this)"
+            style="background: rgba(248, 113, 113, 0.05)"
+          >
+            <h4 style="color: var(--c5)">
+              📋 Cheat Sheet — Evaluación de Modelos
+            </h4>
+            <span class="cheatsheet-toggle">▼</span>
+          </div>
+          <div class="cheatsheet-body">
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c5)">→</span
+              ><span class="cs-text"
+                ><strong>Paradoja de Accuracy</strong>: con clases
+                desbalanceadas, predecir siempre la clase mayoritaria da
+                accuracy alta pero es inútil. Usa F1, AUC, Recall.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c5)">→</span
+              ><span class="cs-text"
+                ><strong>Precision</strong>: de lo que predije como positivo,
+                ¿qué % era realmente positivo? (TP / predichos positivos)</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c5)">→</span
+              ><span class="cs-text"
+                ><strong>Recall</strong>: de todos los positivos reales, ¿qué %
+                detecté? (TP / reales positivos). Crítico en fraude y
+                diagnóstico médico.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c5)">→</span
+              ><span class="cs-text"
+                ><strong>ROC-AUC</strong> para clases balanceadas.
+                <strong>PR-AUC</strong> para clases muy desbalanceadas.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c5)">→</span
+              ><span class="cs-text"
+                ><strong>Lift</strong> = % positivos en el decil / % positivos
+                en la muestra total. Lift 4x en D1 = 4 veces más eficiente que
+                al azar.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c5)">→</span
+              ><span class="cs-text"
+                ><strong>Profit Curve</strong> tiene forma de montaña. El pico
+                indica el umbral de decisión óptimo para maximizar
+                utilidad.</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="quiz-block">
+          <h4>🧠 Autoevaluación — Evaluación de Modelos</h4>
+          <div class="quiz-q">
+            <p>
+              Demuestra numéricamente la Paradoja de la Exactitud. Tengo 1,000
+              clientes, 950 sanos y 50 enfermos. Mi modelo dice "sano" a todos.
+              ¿Cuál es su accuracy, precision y recall?
+            </p>
+            <textarea
+              class="blank-field"
+              placeholder="Escribe tu respuesta aquí..."
+            ></textarea>
+            <button class="reveal-btn" onclick="reveal(this)">
+              Ver respuesta
+            </button>
+            <div class="quiz-answer">
+              Accuracy = 950/1000 = <strong>95%</strong> (parece excelente).
+              Precision para "enfermo" = 0/0 = indefinida (nunca predijo nadie
+              como enfermo). Recall para "enfermo" = 0/50 = <strong>0%</strong>.
+              El modelo detectó CERO enfermos de 50. Su accuracy del 95% es una
+              mentira — es completamente inútil para el propósito médico. Por
+              eso en clases desbalanceadas siempre usamos F1, AUC o Recall en
+              lugar de accuracy.
+            </div>
+          </div>
+          <div class="quiz-q">
+            <p>
+              ¿Cuándo preferirías usar PR-AUC sobre ROC-AUC? Explica con un
+              ejemplo.
+            </p>
+            <textarea
+              class="blank-field"
+              placeholder="Escribe tu respuesta aquí..."
+            ></textarea>
+            <button class="reveal-btn" onclick="reveal(this)">
+              Ver respuesta
+            </button>
+            <div class="quiz-answer">
+              Cuando las clases están muy desbalanceadas (ej: detección de
+              fraude donde solo el 0.5% son fraudes). La ROC-AUC puede aparecer
+              muy alta (0.95+) porque hay muchos TN (transacciones legítimas)
+              que son fáciles de clasificar correctamente, enmascarando el mal
+              performance en la clase minoritaria (fraudes). La PR-AUC enfoca la
+              evaluación en cómo el modelo maneja la clase positiva (fraude),
+              que es la que realmente importa.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================
+     SECCIÓN 6: ÁRBOLES DE DECISIÓN
+     ============================================================ -->
+      <section class="section s6" id="s6">
+        <div class="section-num">TEMA 06 / 06</div>
+        <div class="section-header">
+          <div class="section-icon">🌳</div>
+          <div>
+            <h2>Árboles de <span class="accent">Decisión</span></h2>
+            <div class="section-subtitle">
+              Gini · Entropía · CART · Sobreajuste · Importancia de Variables ·
+              Optuna
+            </div>
+          </div>
+        </div>
+
+        <div class="analogy-card">
+          <div class="analogy-emoji">🎮</div>
+          <div>
+            <h4>Analogía — "¿Quién es quién?" (el juego de mesa)</h4>
+            <p>
+              Los árboles de decisión funcionan exactamente como el juego de
+              "¿Quién es quién?": haces preguntas binarias (<strong
+                >"¿Tiene lentes? ¿Sí o No?"</strong
+              >) para ir eliminando posibilidades hasta llegar a la respuesta.
+              El algoritmo hace lo mismo con tus datos: busca la pregunta que
+              <strong>mejor divide</strong> los datos en grupos más homogéneos,
+              y así sucesivamente hasta que todos los grupos sean puros.
+            </p>
+          </div>
+        </div>
+
+        <h3>Estructura de un <span class="kw">Árbol</span></h3>
+
+        <div class="diagram">
+          <h4>Anatomía de un árbol de decisión</h4>
+          <div
+            style="
+              text-align: center;
+              line-height: 2.5;
+              font-family: &quot;DM Mono&quot;, monospace;
+              font-size: 13px;
+            "
+          >
+            <div>
+              <span class="tree-node tree-root">¿Edad ≤ 30?</span> ← Nodo Raíz
+              (todos los datos)
+            </div>
+            <div style="display: flex; justify-content: center; gap: 80px">
+              <span style="color: var(--text-muted)">Sí ↙</span>
+              <span style="color: var(--text-muted)">↘ No</span>
+            </div>
+            <div style="display: flex; justify-content: center; gap: 60px">
+              <span class="tree-node tree-inner">¿Ingreso ≤ 40K?</span>
+              <span class="tree-node tree-leaf-yes">✅ Compra = SÍ</span>
+            </div>
+            <div
+              style="
+                display: flex;
+                justify-content: center;
+                gap: 20px;
+                margin-left: -120px;
+              "
+            >
+              <span style="color: var(--text-muted)">Sí ↙</span>
+              <span style="color: var(--text-muted)">↘ No</span>
+            </div>
+            <div
+              style="
+                display: flex;
+                justify-content: center;
+                gap: 20px;
+                margin-left: -120px;
+              "
+            >
+              <span class="tree-node tree-leaf-no">❌ Compra = NO</span>
+              <span class="tree-node tree-leaf-yes">✅ Compra = SÍ</span>
+            </div>
+          </div>
+          <div
+            style="margin-top: 16px; display: flex; gap: 16px; flex-wrap: wrap"
+          >
+            <span
+              style="
+                font-size: 12px;
+                padding: 4px 10px;
+                border-radius: 6px;
+                background: rgba(52, 211, 153, 0.1);
+                color: #34d399;
+                border: 1px solid rgba(52, 211, 153, 0.3);
+              "
+              >Nodo Raíz = todos los datos</span
+            >
+            <span
+              style="
+                font-size: 12px;
+                padding: 4px 10px;
+                border-radius: 6px;
+                background: rgba(167, 139, 250, 0.1);
+                color: #a78bfa;
+                border: 1px solid rgba(167, 139, 250, 0.3);
+              "
+              >Nodo Interno = pregunta binaria</span
+            >
+            <span
+              style="
+                font-size: 12px;
+                padding: 4px 10px;
+                border-radius: 6px;
+                background: rgba(34, 197, 94, 0.1);
+                color: #22c55e;
+                border: 1px solid rgba(34, 197, 94, 0.3);
+              "
+              >Hoja = predicción final</span
+            >
+          </div>
+        </div>
+
+        <h3>
+          Criterios de Impureza: <span class="kw">Gini</span> y
+          <span class="kw">Entropía</span>
+        </h3>
+        <p class="body-text">
+          Para encontrar el mejor split, necesitamos medir qué tan "mezcladas"
+          están las clases en un nodo. Un nodo puro (todos de la misma clase)
+          tiene impureza = 0. Un nodo totalmente mezclado (50% cada clase) tiene
+          impureza máxima.
+        </p>
+
+        <div class="formula">
+          <span class="highlight">ÍNDICE DE GINI</span> — "probabilidad de
+          clasificar mal al azar" I_G(t) = 1 - Σ p_k² Ejemplo: 7 perros, 3 gatos
+          (n=10) p_perro = 0.7, p_gato = 0.3 I_G = 1 - (0.7² + 0.3²) = 1 - (0.49
+          + 0.09) = <span class="green">0.42</span>
+          Nodo puro → I_G = 0 | Máxima mezcla → I_G = 0.5
+
+          <span class="blue">ENTROPÍA</span> — "cuánta incertidumbre/sorpresa
+          hay" H(t) = -Σ p_k × log₂(p_k) Mismo ejemplo: 7 perros, 3 gatos H =
+          -(0.7×log₂(0.7) + 0.3×log₂(0.3)) = -(0.7×(-0.515) + 0.3×(-1.737)) =
+          -(−0.361 − 0.521) = <span class="green">0.88 bits</span>
+          Nodo puro → H = 0 | Máxima mezcla → H = 1 bit
+
+          <span class="purple">GANANCIA DE INFORMACIÓN</span> — ¿qué tan bueno
+          es el split? IG = H(padre) - Σ (n_hijo/n_total) × H(hijo) → Elegimos
+          el split que MAXIMIZA la ganancia de información
+        </div>
+
+        <div class="impurity-meter">
+          <div
+            style="
+              font-size: 12px;
+              color: var(--text-muted);
+              margin-bottom: 6px;
+              font-family: &quot;DM Mono&quot;, monospace;
+            "
+          >
+            Impureza según proporción de la clase positiva (p)
+          </div>
+          <div class="meter-row">
+            <span class="meter-label">p = 0.0 (puro)</span>
+            <div class="meter-bar-bg">
+              <div
+                class="meter-fill"
+                style="width: 0%; background: #34d399"
+              ></div>
+            </div>
+            <span class="meter-val">0.00</span>
+          </div>
+          <div class="meter-row">
+            <span class="meter-label">p = 0.1</span>
+            <div class="meter-bar-bg">
+              <div
+                class="meter-fill"
+                style="width: 18%; background: #60a5fa"
+              ></div>
+            </div>
+            <span class="meter-val">0.18</span>
+          </div>
+          <div class="meter-row">
+            <span class="meter-label">p = 0.3</span>
+            <div class="meter-bar-bg">
+              <div
+                class="meter-fill"
+                style="width: 42%; background: #f59e0b"
+              ></div>
+            </div>
+            <span class="meter-val">0.42</span>
+          </div>
+          <div class="meter-row">
+            <span class="meter-label">p = 0.5 (máximo)</span>
+            <div class="meter-bar-bg">
+              <div
+                class="meter-fill"
+                style="width: 100%; background: #f87171"
+              ></div>
+            </div>
+            <span class="meter-val">0.50</span>
+          </div>
+          <div class="meter-row">
+            <span class="meter-label">p = 0.7</span>
+            <div class="meter-bar-bg">
+              <div
+                class="meter-fill"
+                style="width: 42%; background: #f59e0b"
+              ></div>
+            </div>
+            <span class="meter-val">0.42</span>
+          </div>
+          <div class="meter-row">
+            <span class="meter-label">p = 0.9</span>
+            <div class="meter-bar-bg">
+              <div
+                class="meter-fill"
+                style="width: 18%; background: #60a5fa"
+              ></div>
+            </div>
+            <span class="meter-val">0.18</span>
+          </div>
+        </div>
+        <p
+          style="font-size: 12px; color: var(--text-muted); margin-bottom: 24px"
+        >
+          Valores de Gini. La impureza es simétrica: un nodo con 90% clase 0 es
+          igual de "puro" que uno con 90% clase 1.
+        </p>
+
+        <h3>
+          Algoritmo <span class="kw">CART</span> — Construcción paso a paso
+        </h3>
+        <div class="formula">
+          Para cada nodo, CART hace lo siguiente (greedy, top-down): Para cada
+          variable xⱼ: Para cada posible punto de corte c: Split izquierda =
+          {xi: xⱼ ≤ c} Split derecha = {xi: xⱼ > c} Ganancia = Impureza(padre) -
+          (n_izq/n × Impureza(izq) + n_der/n × Impureza(der)) Elige el (xⱼ, c)
+          que MAXIMIZA la ganancia Divide el nodo y repite recursivamente
+          Criterio de parada (evita overfitting): max_depth = profundidad máxima
+          del árbol min_samples = mínimo de muestras para dividir un nodo Nodo
+          puro = todos los ejemplos son de la misma clase
+        </div>
+
+        <h3>Sobreajuste y <span class="kw">Control de Complejidad</span></h3>
+        <div class="analogy-card">
+          <div class="analogy-emoji">✂️</div>
+          <div>
+            <h4>Analogía — Podar un bonsái</h4>
+            <p>
+              Un árbol de decisión sin control crece infinitamente hasta
+              memorizar cada dato de entrenamiento (cada hoja contiene un solo
+              punto). Es como un bonsái que crece sin poda — incontrolable. La
+              <strong>poda (pruning)</strong> corta ramas que no aportan valor
+              predictivo. El parámetro <code>max_depth</code> es como establecer
+              la altura máxima antes de plantar. El objetivo: árbol lo
+              suficientemente complejo para capturar el patrón, lo
+              suficientemente simple para no memorizar el ruido.
+            </p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <tr>
+              <th>Parámetro</th>
+              <th>Qué controla</th>
+              <th>Efecto de aumentarlo</th>
+            </tr>
+            <tr>
+              <td><strong>max_depth</strong></td>
+              <td>Profundidad máxima del árbol</td>
+              <td>Más preguntas → más complejo → más overfitting</td>
+            </tr>
+            <tr>
+              <td><strong>min_samples_split</strong></td>
+              <td>Mínimo de muestras para dividir</td>
+              <td>Más muestras requeridas → árbol más simple</td>
+            </tr>
+            <tr>
+              <td><strong>min_samples_leaf</strong></td>
+              <td>Mínimo de muestras en cada hoja</td>
+              <td>Más muestras por hoja → árbol más conservador</td>
+            </tr>
+            <tr>
+              <td><strong>ccp_alpha</strong></td>
+              <td>Parámetro de poda por costo-complejidad</td>
+              <td>Mayor penalización → más ramas podadas → más simple</td>
+            </tr>
+          </table>
+        </div>
+
+        <h3>
+          Importancia de Variables vs.
+          <span class="kw">Permutation Importance</span>
+        </h3>
+        <div class="formula">
+          Importancia de Variable (Feature Importance): Mide cuánto contribuyó
+          cada variable a reducir la impureza en todos los splits donde
+          apareció. Variables en nodos cercanos a la raíz = más peso
+          <span class="red">Problema</span>: puede sobreestimar variables con
+          muchos valores únicos Permutation Importance: Desordena aleatoriamente
+          una variable y mide cuánto empeora el modelo Si al desordenar "edad"
+          el modelo empeora mucho → "edad" es importante Más robusto y menos
+          sesgado que Feature Importance estándar Puede aplicarse a CUALQUIER
+          modelo (no solo árboles)
+        </div>
+
+        <h3>
+          Optimización con <span class="kw">Optuna</span> — Búsqueda inteligente
+          de hiperparámetros
+        </h3>
+        <div class="analogy-card">
+          <div class="analogy-emoji">🗺️</div>
+          <div>
+            <h4>Analogía — El explorador vs. el cartógrafo</h4>
+            <p>
+              <strong>Grid Search</strong> es como explorar un territorio
+              probando TODOS los puntos del mapa en orden, uno por uno —
+              exhaustivo pero lentísimo. <strong>Optuna</strong> es como un
+              explorador inteligente que, después de explorar varias zonas,
+              aprende qué regiones del mapa tienen más probabilidad de contener
+              tesoros y explora más a fondo esas zonas, ignorando las que ya
+              mostró resultados pobres.
+            </p>
+          </div>
+        </div>
+
+        <div class="formula">
+          Grid Search: Optuna (TPE - Tree-structured Parzen): Prueba TODAS las
+          combinaciones Prueba un subconjunto, aprende dónde max_depth =
+          [3,5,7,10] buscar mejor, enfoca el esfuerzo min_samples = [2,5,10,20]
+          Total: 4×4 = 16 pruebas Mucho más eficiente con muchos parámetros
+          Optuna define un "estudio" y corre N "trials": study =
+          optuna.create_study(direction='maximize') study.optimize(objective,
+          n_trials=100) best_params = study.best_params Ventaja: puede manejar
+          decenas de hiperparámetros eficientemente
+        </div>
+
+        <div class="biz-card">
+          <div class="biz-tag" style="color: var(--c6)">
+            🏦 Ejemplo Financiero — Árbol para decisiones de crédito
+          </div>
+          <h4>
+            ¿Por qué un banco prefiere árboles sobre redes neuronales para
+            crédito?
+          </h4>
+          <p>
+            El GDPR y regulaciones bancarias exigen que un cliente rechazado
+            para un crédito tenga derecho a una explicación. Un árbol de
+            decisión produce reglas legibles: "Tu crédito fue rechazado porque:
+            1) tienes menos de 12 meses de historial crediticio, Y 2) tu ratio
+            deuda/ingreso supera 0.4." Una red neuronal no puede explicarlo. En
+            contextos regulados, la interpretabilidad no es opcional — es un
+            requisito legal.
+          </p>
+          <span class="roi-badge"
+            >⚖️ Cumplimiento regulatorio = sin multas millonarias</span
+          >
+        </div>
+
+        <div class="cheatsheet">
+          <div
+            class="cheatsheet-header"
+            onclick="toggleCS(this)"
+            style="background: rgba(52, 211, 153, 0.05)"
+          >
+            <h4 style="color: var(--c6)">
+              📋 Cheat Sheet — Árboles de Decisión
+            </h4>
+            <span class="cheatsheet-toggle">▼</span>
+          </div>
+          <div class="cheatsheet-body">
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c6)">→</span
+              ><span class="cs-text"
+                ><strong>Gini</strong>: 1 - Σ p_k². Va de 0 (nodo puro) a 0.5
+                (máxima mezcla, 2 clases). Usa: "probabilidad de clasificar
+                mal".</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c6)">→</span
+              ><span class="cs-text"
+                ><strong>Entropía</strong>: -Σ p_k × log₂(p_k). Va de 0 a 1 bit
+                (2 clases). Usa: "bits de incertidumbre".</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c6)">→</span
+              ><span class="cs-text"
+                ><strong>CART</strong>: greedy top-down. En cada nodo elige el
+                split que maximiza la ganancia de información.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c6)">→</span
+              ><span class="cs-text"
+                ><strong>max_depth</strong> es el parámetro más importante para
+                controlar overfitting. Árbol profundo = alta varianza.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c6)">→</span
+              ><span class="cs-text"
+                ><strong>Feature Importance</strong> ≠
+                <strong>Permutation Importance</strong>. Permutation es más
+                robusto y aplicable a cualquier modelo.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c6)">→</span
+              ><span class="cs-text"
+                ><strong>Ventaja de árboles</strong>: interpretabilidad — puedes
+                extraer reglas de negocio en lenguaje natural. Crítico en
+                contextos regulados.</span
+              >
+            </div>
+            <div class="cs-item">
+              <span class="cs-bullet" style="color: var(--c6)">→</span
+              ><span class="cs-text"
+                ><strong>Optuna</strong>: busca hiperparámetros óptimos de forma
+                inteligente (TPE). Mucho más eficiente que Grid Search
+                exhaustivo.</span
+              >
+            </div>
+          </div>
+        </div>
+
+        <div class="quiz-block">
+          <h4>🧠 Autoevaluación — Árboles de Decisión</h4>
+          <div class="quiz-q">
+            <p>
+              Calcula el Índice de Gini para un nodo con 6 positivos y 4
+              negativos (10 total). ¿Es un nodo "puro" o muy mezclado?
+            </p>
+            <textarea
+              class="blank-field"
+              placeholder="Escribe tu respuesta aquí..."
+            ></textarea>
+            <button class="reveal-btn" onclick="reveal(this)">
+              Ver respuesta
+            </button>
+            <div class="quiz-answer">
+              p_positivo = 6/10 = 0.6, p_negativo = 4/10 = 0.4.
+              <strong
+                >Gini = 1 - (0.6² + 0.4²) = 1 - (0.36 + 0.16) = 1 - 0.52 =
+                0.48</strong
+              >. Es un nodo bastante mezclado — cercano al máximo de 0.5. El
+              árbol necesita hacer una pregunta para dividirlo en grupos más
+              puros.
+            </div>
+          </div>
+          <div class="quiz-q">
+            <p>
+              ¿Por qué un árbol de decisión es preferible a una red neuronal en
+              contextos bancarios regulados? ¿Qué parámetro controla
+              principalmente el overfitting?
+            </p>
+            <textarea
+              class="blank-field"
+              placeholder="Escribe tu respuesta aquí..."
+            ></textarea>
+            <button class="reveal-btn" onclick="reveal(this)">
+              Ver respuesta
+            </button>
+            <div class="quiz-answer">
+              Porque los árboles son <strong>interpretables</strong>: generan
+              reglas de negocio en lenguaje natural que pueden explicarse a los
+              clientes y reguladores (el GDPR exige el "derecho a la
+              explicación"). Una red neuronal es una "caja negra" que no puede
+              explicar por qué tomó una decisión. El parámetro que más controla
+              el overfitting es <strong>max_depth</strong>: a mayor profundidad,
+              más complejo el árbol y mayor riesgo de memorizar el ruido de
+              entrenamiento.
+            </div>
+          </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div
+          style="
+            margin-top: 60px;
+            padding: 40px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+          "
+        >
+          <div
+            style="
+              font-family: &quot;Syne&quot;, sans-serif;
+              font-size: 24px;
+              font-weight: 800;
+              color: #fff;
+              margin-bottom: 8px;
+            "
+          >
+            Tú puedes. 💪
+          </div>
+          <div style="font-size: 14px; color: var(--text-muted)">
+            6 temas. Revisados. Comprendidos. Ahora ve a dormir bien la noche
+            anterior — el cerebro consolida mientras duermes.
+          </div>
+          <div
+            style="
+              display: flex;
+              justify-content: center;
+              gap: 16px;
+              margin-top: 20px;
+              flex-wrap: wrap;
+            "
+          >
+            <span
+              style="
+                font-size: 12px;
+                padding: 6px 14px;
+                border-radius: 20px;
+                border: 1px solid var(--border);
+                color: var(--text-muted);
+              "
+              >ITAM 2026</span
+            >
+            <span
+              style="
+                font-size: 12px;
+                padding: 6px 14px;
+                border-radius: 20px;
+                border: 1px solid var(--border);
+                color: var(--text-muted);
+              "
+              >Examen Parcial · Abril 15</span
+            >
+            <span
+              style="
+                font-size: 12px;
+                padding: 6px 14px;
+                border-radius: 20px;
+                border: 1px solid rgba(34, 197, 94, 0.3);
+                color: #22c55e;
+              "
+              >Guía completa ✓</span
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      /* Progress bar */
+      window.addEventListener("scroll", () => {
+        const el = document.getElementById("progress-bar");
+        const scrollTop = document.documentElement.scrollTop;
+        const scrollHeight =
+          document.documentElement.scrollHeight - window.innerHeight;
+        el.style.width = (scrollTop / scrollHeight) * 100 + "%";
+      });
+
+      /* Active nav dot */
+      const sections = document.querySelectorAll("section[id]");
+      const navDots = document.querySelectorAll(".nav-dot[data-topic]");
+      window.addEventListener(
+        "scroll",
+        () => {
+          let cur = "";
+          sections.forEach((s) => {
+            if (window.scrollY >= s.offsetTop - 200)
+              cur = s.id.replace("s", "");
+          });
+          navDots.forEach((d) => {
+            d.classList.toggle("active", d.dataset.topic === cur);
+          });
+        },
+        { passive: true },
+      );
+
+      /* Toggle cheat sheets */
+      function toggleCS(header) {
+        const body = header.nextElementSibling;
+        const toggle = header.querySelector(".cheatsheet-toggle");
+        const open = body.classList.toggle("open");
+        toggle.classList.toggle("open", open);
+      }
+
+      /* Reveal quiz answers */
+      function reveal(btn) {
+        const answer = btn.nextElementSibling;
+        const isVisible = answer.style.display === "block";
+        answer.style.display = isVisible ? "none" : "block";
+        btn.textContent = isVisible ? "Ver respuesta" : "Ocultar respuesta";
+      }
+    </script>
+  </body>
+</html>
