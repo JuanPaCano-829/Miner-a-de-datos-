@@ -3,6 +3,8 @@ $\rightarrow$ apuntes: https://nasaul.github.io/mineria_datos/
 
 https://github.com/nasaul/mineria_datos
 
+https://juanpacano-829.github.io/Miner-a-de-datos-/guia_primer_parcial.html
+
 ## I. Fundamentos y Proceso
 - El Ecosistema de Datos
 
